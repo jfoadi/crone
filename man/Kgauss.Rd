@@ -22,6 +22,5 @@ Constant normalizing wrapped gaussian
 \examples{
 Z <- 16  # Sulphur atom
 sigma <- 0.05*sqrt(Z)
-#' @export
 }
 

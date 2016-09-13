@@ -78,3 +78,25 @@ erf <- function(x)
   
   return(value)
 }
+
+# To check whether elements in a vector have numerical value very close
+# to the value of others.
+
+isRoughlyEqual <- function(v,eps=0.000001)
+{
+  n <- length(v)
+  vidx <- c()
+  for (i in 2:n)
+  {
+    idx <- which(abs(v[i-1]-v) < eps)
+    if (length(idx) > 0)
+    {
+      jdx <- which(idx <= (i-1))
+      if (length(jdx) > 0) idx <- idx[-jdx]
+    }
+    vidx <- c(vidx,idx)
+  }
+  vidx <- sort(unique(vidx))
+  
+  return(vidx)
+}
