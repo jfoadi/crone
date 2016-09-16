@@ -4,13 +4,18 @@
 \alias{choose_a}
 \title{Suggests unit cell side, a, based on atom content}
 \usage{
-choose_a(vZ, D, k = ksigma, Ma = 5)
+choose_a(vZ, D, SG = "P1", k = ksigma, Ma = 5)
 }
 \arguments{
 \item{vZ}{A vector of atom Z numbers.}
 
 \item{D}{A real number. The distance between the two furthest atoms
 in the cell.}
+
+\item{SG}{2-letters character string. Symmetry. There are only two
+symmetries possible when working within 1D crystallography, P1 (no
+symmetry)and P-1 (inversion through the origin). SG can be either "P1"
+or "P-1" for this function.}
 
 \item{k}{A real number. It controls the standard deviation of the 
 gaussian function describing the atom and, thus, the shape of the
@@ -22,10 +27,13 @@ distance of Ma * sigma from its peak.}
 }
 \value{
 A real number that suggests a feasible unit cell side 
-containing all atoms
+containing all atoms.
 }
 \description{
-Suggests unit cell side, a, based on atom content
+The unit cell side is roughly calculated by adding two times the half-width
+of the widest gaussian atom to the largest inter-atomic distance. The
+half-width of the largest gaussian is computed as Ma times the gaussian
+sigma. If the "P-1" symmetry is present, D is doubled.
 }
 \examples{
 # 2 carbon atoms, a sulphur and an oxygen

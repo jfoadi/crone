@@ -4,9 +4,17 @@
 
 #' Suggests unit cell side, a, based on atom content
 #'
+#' The unit cell side is roughly calculated by adding two times the half-width
+#' of the widest gaussian atom to the largest inter-atomic distance. The
+#' half-width of the largest gaussian is computed as Ma times the gaussian
+#' sigma. If the "P-1" symmetry is present, D is doubled.
 #' @param vZ A vector of atom Z numbers.
 #' @param D A real number. The distance between the two furthest atoms
 #' in the cell.
+#' @param SG 2-letters character string. Symmetry. There are only two
+#'  symmetries possible when working within 1D crystallography, P1 (no
+#'  symmetry)and P-1 (inversion through the origin). SG can be either "P1"
+#'  or "P-1" for this function.
 #' @param k A real number. It controls the standard deviation of the 
 #' gaussian function describing the atom and, thus, the shape of the
 #' associated peak. The standard deviation sigma is given by:
@@ -14,7 +22,7 @@
 #' @param Ma A real number. Each gaussian atom has tails truncated at a
 #' distance of Ma * sigma from its peak.
 #' @return A real number that suggests a feasible unit cell side 
-#' containing all atoms
+#' containing all atoms.
 #' @examples 
 #' # 2 carbon atoms, a sulphur and an oxygen
 #' vZ <- c(6,8,16,6)
@@ -23,9 +31,14 @@
 #' D <- 15
 #' a <- choose_a(vZ,D)
 #' @export 
-choose_a <- function(vZ,D,k=ksigma,Ma=5)
+choose_a <- function(vZ,D,SG="P1",k=ksigma,Ma=5)
 {
+  if (SG != "P-1" & SG != "P1")
+  {
+    stop("Wrong Space Group!")
+  }
   vsigma <- k*sqrt(vZ)
+  if (SG == "P-1") D <- 2*D
   a <- D+2*Ma*max(vsigma)
   
   return(a)
@@ -115,7 +128,8 @@ cold_atom_gauss <- function(x,a,x0=0,Z=1,k=ksigma)
 #' 
 #' Atom positions, types, B factors and occupancies are duplicated if
 #' input space group (SG) is P-1; otherwise they are left untouched
-#' (space group P1).
+#' (space group P1). Value of the occupancy for special positions is
+#' not checked.
 #' 
 #' @param a Real numeric. Unit cell length in angstroms.
 #' @param vx0 Vector of real numerics. Atom positions in the asymmetric
@@ -159,6 +173,10 @@ cold_atom_gauss <- function(x,a,x0=0,Z=1,k=ksigma)
 #' @export
 expand_to_cell <- function(a,vx0,vZ,vB,vocc,SG="P1")
 {
+  if (SG != "P-1" & SG != "P1")
+  {
+    stop("Wrong Space Group!")
+  }
   if (SG == "P-1")
   {
     # Shift to interval 0-a/2 if needed
@@ -173,9 +191,16 @@ expand_to_cell <- function(a,vx0,vZ,vB,vocc,SG="P1")
     vZ <- c(vZ,vZ)
     vB <- c(vB,vB)
   }
-  if (SG != "P-1" & SG != "P1")
+  
+  # Get rid of duplicated atoms (special positions)
+  ltmp <- isRoughlyEqual(vx0)
+  idx <- ltmp[[1]]
+  if (length(idx) > 0)
   {
-    stop("Wrong Space Group!")
+    vx0 <- vx0[idx]
+    vZ <- vZ[idx]
+    vB <- vB[idx]
+    vocc <- vocc[idx]
   }
   
   # Final sorting according to atom positions
@@ -269,14 +294,15 @@ reduce_to_asu <- function(a,vx0,vZ,vB,vocc,SG="P1")
   vB <- vB[idx]
   vocc <- vocc[idx]
   
-  # Get rid of duplicated atoms at unit cell edges
-  idx <- isRoughlyEqual(vx0)
+  # Get rid of duplicated atoms (special positions)
+  ltmp <- isRoughlyEqual(vx0)
+  idx <- ltmp[[1]]
   if (length(idx) > 0)
   {
-   vx0 <- vx0[-idx]
-   vZ <- vZ[-idx]
-   vB <- vB[-idx]
-   vocc <- vocc[-idx]
+   vx0 <- vx0[idx]
+   vZ <- vZ[idx]
+   vB <- vB[idx]
+   vocc <- vocc[idx]
   }
   
   # Save for later check

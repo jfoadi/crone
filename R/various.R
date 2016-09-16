@@ -85,18 +85,21 @@ erf <- function(x)
 isRoughlyEqual <- function(v,eps=0.000001)
 {
   n <- length(v)
-  vidx <- c()
+  lidx <- list()
   for (i in 2:n)
   {
-    idx <- which(abs(v[i-1]-v) < eps)
-    if (length(idx) > 0)
+    idx <- which(abs(v[i-1]-v) < eps & !is.na(v))
+    if (length(idx) > 0) 
     {
-      jdx <- which(idx <= (i-1))
-      if (length(jdx) > 0) idx <- idx[-jdx]
+      lidx <- c(lidx,list(idx))
+      v[idx] <- NA
     }
-    vidx <- c(vidx,idx)
   }
-  vidx <- sort(unique(vidx))
+  if (!is.na(v[n])) lidx <- c(lidx,list(n))
   
-  return(vidx)
+  # First element of all vectors belonging to list are the unique ones
+  vidx <- c()
+  for (i in 1:length(lidx)) vidx <- c(vidx,lidx[[i]][1])
+  
+  return(list(vidx=vidx,lidx=lidx))
 }
