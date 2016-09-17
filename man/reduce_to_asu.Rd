@@ -50,12 +50,12 @@ is forced to have values inside the unit cell and it is sorted according
 to increasing atom positions.
 }
 \examples{
-# Asymmetric unit includes 3 atoms between 0 and a/2
+# Asymmetric unit includes 4 atoms between 0 and a/2, 1 in special position
 a <- 10
-vx0 <- c(1,2,4)
-vZ <- c(6,8,6)
-vB <- c(1,1.2,1.1)
-vocc <- c(1,1,1)
+vx0 <- c(1,2,4,5)
+vZ <- c(6,8,6,16)
+vB <- c(1,1.2,1.1,0.8)
+vocc <- c(1,1,1,0.5)
 ltmp <- expand_to_cell(a,vx0,vZ,vB,vocc,SG="P-1")
 print(ltmp)  # Positions, atomic numbers, etc. have doubled
 
@@ -68,8 +68,11 @@ print(ltmp2$vx0)
 
 # SG is "P1"
 a <- 16
-vx0 <- c(1,2,7,9,10,17.5)  # Other arrays are same as before
-ltmp3 <- reduce_to_asu(a,vx0,ltmp$vZ,ltmp$vB,ltmp$vocc)
+vx0 <- c(1,2,7,9,12,16)
+vZ <- c(6,6,8,8,7,6)
+vB <- c(0,0,0,0,0,0)
+vocc <- c(1,1,1,1,1,1)
+ltmp3 <- reduce_to_asu(a,vx0,vZ,vB,vocc)
 print(ltmp3) # Now all positions are inside the unit cell
 }
 

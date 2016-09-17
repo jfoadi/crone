@@ -129,7 +129,7 @@ cold_atom_gauss <- function(x,a,x0=0,Z=1,k=ksigma)
 #' Atom positions, types, B factors and occupancies are duplicated if
 #' input space group (SG) is P-1; otherwise they are left untouched
 #' (space group P1). Value of the occupancy for special positions is
-#' not checked.
+#' barely checked for values outside [0,1] range. Extra-care needed.
 #' 
 #' @param a Real numeric. Unit cell length in angstroms.
 #' @param vx0 Vector of real numerics. Atom positions in the asymmetric
@@ -163,20 +163,40 @@ cold_atom_gauss <- function(x,a,x0=0,Z=1,k=ksigma)
 #' vx0 <- c(1,2,4)
 #' vZ <- c(6,8,6)
 #' vB <- c(1,1.2,1.1)
-#' vocc <- c(1,1,1)
-#' ltmp <- expand_to_cell(a,vx0,vZ,vocc,"P-1")
+#' vocc <- c(1,1,0.8)
+#' ltmp <- expand_to_cell(a,vx0,vZ,vB,vocc,"P-1")
 #' print(ltmp)  # Positions, atomic numbers, etc. have doubled
 #' 
 #' # Nothing changes if SG is "P1"
-#' ltmp <- expand_to_cell(a,vx0,vZ,vocc,"P1")
+#' ltmp <- expand_to_cell(a,vx0,vZ,vB,vocc,"P1")
 #' print(ltmp)
 #' @export
 expand_to_cell <- function(a,vx0,vZ,vB,vocc,SG="P1")
 {
+  # Check on arrays length
+  if ((length(vZ) != length(vx0)) |
+      (length(vB) != length(vx0)) |
+      (length(vocc) != length(vx0)))
+    stop("Input arrays must all have same size.")
+  
+  # Only two space groups in 1D
   if (SG != "P-1" & SG != "P1")
   {
     stop("Wrong Space Group!")
   }
+  
+  # Shift atoms inside unit cell
+  vx0 <- vx0%%a
+  
+  # Eliminate overlapping atoms (no change of occupancy)
+  ltmp <- isRoughlyEqual(vx0)
+  idx <- ltmp[[1]]
+  vx0 <- vx0[idx]
+  vZ <- vZ[idx]
+  vB <- vB[idx]
+  vocc <- vocc[idx]
+  
+  # Specific to space group P-1
   if (SG == "P-1")
   {
     # Shift to interval 0-a/2 if needed
@@ -192,7 +212,7 @@ expand_to_cell <- function(a,vx0,vZ,vB,vocc,SG="P1")
     vB <- c(vB,vB)
   }
   
-  # Get rid of duplicated atoms (special positions)
+  # Get rid of duplicated atoms
   ltmp <- isRoughlyEqual(vx0)
   idx <- ltmp[[1]]
   if (length(idx) > 0)
@@ -202,6 +222,16 @@ expand_to_cell <- function(a,vx0,vZ,vB,vocc,SG="P1")
     vB <- vB[idx]
     vocc <- vocc[idx]
   }
+  
+  # Change occupancy for atoms in special position
+  idx <- which(abs(vx0) < 0.000001 | abs(vx0-a) < 0.000001 |
+                 abs(vx0-0.5*a) < 0.000001)
+  vocc[idx] <- vocc[idx]*2
+  
+  # Check abnormal values of occupancy
+  idx <- which(vocc < 0 | vocc > 1)
+  if (length(idx) > 0)
+    warning("Out-of-scale occupancies produced!")
   
   # Final sorting according to atom positions
   idx <- order(vx0)
@@ -250,12 +280,12 @@ expand_to_cell <- function(a,vx0,vZ,vB,vocc,SG="P1")
 #'                  for all atoms in the asymmetric unit.}
 #'  }
 #' @examples 
-#' # Asymmetric unit includes 3 atoms between 0 and a/2
+#' # Asymmetric unit includes 4 atoms between 0 and a/2, 1 in special position
 #' a <- 10
-#' vx0 <- c(1,2,4)
-#' vZ <- c(6,8,6)
-#' vB <- c(1,1.2,1.1)
-#' vocc <- c(1,1,1)
+#' vx0 <- c(1,2,4,5)
+#' vZ <- c(6,8,6,16)
+#' vB <- c(1,1.2,1.1,0.8)
+#' vocc <- c(1,1,1,0.5)
 #' ltmp <- expand_to_cell(a,vx0,vZ,vB,vocc,SG="P-1")
 #' print(ltmp)  # Positions, atomic numbers, etc. have doubled
 #' 
@@ -268,8 +298,11 @@ expand_to_cell <- function(a,vx0,vZ,vB,vocc,SG="P1")
 #' 
 #' # SG is "P1"
 #' a <- 16
-#' vx0 <- c(1,2,7,9,10,17.5)  # Other arrays are same as before
-#' ltmp3 <- reduce_to_asu(a,vx0,ltmp$vZ,ltmp$vB,ltmp$vocc)
+#' vx0 <- c(1,2,7,9,12,16)
+#' vZ <- c(6,6,8,8,7,6)
+#' vB <- c(0,0,0,0,0,0)
+#' vocc <- c(1,1,1,1,1,1)
+#' ltmp3 <- reduce_to_asu(a,vx0,vZ,vB,vocc)
 #' print(ltmp3) # Now all positions are inside the unit cell
 #' @export
 reduce_to_asu <- function(a,vx0,vZ,vB,vocc,SG="P1")
@@ -279,6 +312,8 @@ reduce_to_asu <- function(a,vx0,vZ,vB,vocc,SG="P1")
       (length(vB) != length(vx0)) |
       (length(vocc) != length(vx0)))
     stop("Input arrays must all have same size.")
+  
+  # Only two space groups in 1D
   if (SG != "P-1" & SG != "P1")
   {
     stop("Wrong Space Group!")
@@ -287,23 +322,20 @@ reduce_to_asu <- function(a,vx0,vZ,vB,vocc,SG="P1")
   # Move all atoms inside the unit cell
   vx0 <- vx0%%a
   
+  # Eliminate overlapping atoms (no change of occupancy)
+  ltmp <- isRoughlyEqual(vx0)
+  idx <- ltmp[[1]]
+  vx0 <- vx0[idx]
+  vZ <- vZ[idx]
+  vB <- vB[idx]
+  vocc <- vocc[idx]
+  
   # Sort according to increasing atom positions
   idx <- order(vx0)
   vx0 <- vx0[idx]
   vZ <- vZ[idx]
   vB <- vB[idx]
   vocc <- vocc[idx]
-  
-  # Get rid of duplicated atoms (special positions)
-  ltmp <- isRoughlyEqual(vx0)
-  idx <- ltmp[[1]]
-  if (length(idx) > 0)
-  {
-   vx0 <- vx0[idx]
-   vZ <- vZ[idx]
-   vB <- vB[idx]
-   vocc <- vocc[idx]
-  }
   
   # Save for later check
   inivx0 <- vx0
@@ -326,9 +358,15 @@ reduce_to_asu <- function(a,vx0,vZ,vB,vocc,SG="P1")
    nvB <- nvB[idx]
    nvocc <- nvocc[idx]
    
+   # Change occupancy for atoms in special position
+   idx <- which(abs(nvx0) < 0.000001 | abs(nvx0-0.5*a) < 0.000001)
+   nvocc[idx] <- nvocc[idx]*0.5
+   
    # Expand to P1 to double-check
-   ltmp <- expand_to_cell(a,nvx0,nvZ,nvB,nvocc,SG="P-1")
-   expobj <- sort(unique(ltmp$vx0))
+   celltmp <- expand_to_cell(a,nvx0,nvZ,nvB,nvocc,SG="P-1")
+   ltmp <- isRoughlyEqual(celltmp$vx0)
+   idx <- ltmp[[1]]
+   expobj <- celltmp$vx0[idx]
    if (length(expobj) == length(inivx0))
    {
      dd <- abs(expobj-inivx0)

@@ -44,7 +44,8 @@ A named list with the following elements:
 \description{
 Atom positions, types, B factors and occupancies are duplicated if
 input space group (SG) is P-1; otherwise they are left untouched
-(space group P1).
+(space group P1). Value of the occupancy for special positions is
+barely checked for values outside [0,1] range. Extra-care needed.
 }
 \examples{
 # Asymmetric unit includes 3 atoms between 0 and a/2
@@ -52,12 +53,12 @@ a <- 10
 vx0 <- c(1,2,4)
 vZ <- c(6,8,6)
 vB <- c(1,1.2,1.1)
-vocc <- c(1,1,1)
-ltmp <- expand_to_cell(a,vx0,vZ,vocc,"P-1")
+vocc <- c(1,1,0.8)
+ltmp <- expand_to_cell(a,vx0,vZ,vB,vocc,"P-1")
 print(ltmp)  # Positions, atomic numbers, etc. have doubled
 
 # Nothing changes if SG is "P1"
-ltmp <- expand_to_cell(a,vx0,vZ,vocc,"P1")
+ltmp <- expand_to_cell(a,vx0,vZ,vB,vocc,"P1")
 print(ltmp)
 }
 
