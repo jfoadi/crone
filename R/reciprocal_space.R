@@ -271,3 +271,81 @@ strufac <- function(h,a,vx0,vZ,vB,vocc,anoflag=FALSE,
   
   return(F)
 }
+
+
+#' From structure factors to density
+#' 
+#' Given a set of complex structure factors corresponding to a set of 1D
+#' Miller indices, the length of the 1D unit cell, the set of Miller indices
+#' and the number of grid points used to calculate the 1D density, this
+#' function calculates the 1D density corresponding to the given structure
+#' factors.
+#' 
+#' @param a A real number. The unit cell side length.
+#' @param F A vector of complex numbers. The structure factors corresponding to
+#'    the 1D density to be calculated.
+#' @param hidx A vector of integer numbers. The set of 1D Miller indices
+#'    corresponding to the set of structure factors F.
+#' @param N An integer number. The number of grid points used to calculate the
+#'    1D density.
+#' @return A vector of N real numbers representing the calculated 1D density at
+#'    each of the regular N grid points.
+#' @examples 
+#' # First create the crystal structure (in P1)
+#' a <- 10
+#' vx0 <- c(1,4,6.5)
+#' vZ <- c(8,26,6)
+#' vB <- c(18,20,17)
+#' vocc <- c(1,1,1)
+#' 
+#' # Enough Fourier components (Miller indices)
+#' hidx <- 0:20
+#' 
+#' # Compute the structure factors
+#' F <- strufac(hidx,a,vx0,vZ,vB,vocc)
+#' 
+#' # Number of grid points
+#' N <- 100
+#' 
+#' # Density
+#' rtmp <- FToRho(a,F,hidx,N)
+#' 
+#' # Density plot in the unit cell
+#' x <- rtmp$x
+#' rho <- rtmp$rr
+#' plot(x,rho,type="l",xlab="x",ylab=expression(rho))
+#' @export
+FToRho <- function(a,F,hidx,N)
+{
+  # Arrays checks
+  if (length(F) != length(hidx))
+    stop("Arrays do not have same length")
+  
+  # Check numbers are compatible
+  hmax <- max(hidx)
+  if (hmax >= 0.5*N) stop("Grid too coarse. Increase N.")
+  
+  # Initialise fft array
+  G <- rep(0,length=N)
+  
+  # Fill fft array with structure factors
+  G[hidx+1] <- F
+  if (hidx[1] == 0) 
+  {
+    kidx <- N-hidx[2:length(hidx)]+1
+    G[kidx] <- Conj(F[2:length(F)])
+  }
+  if (hidx[1] != 0)
+  {
+    kidx <- N-hidx+1
+    G[kidx] <- Conj(F)
+  }
+  
+  # Density via fft
+  rr <- Re(fft(G))/a
+  
+  # Return x array with same size as rr array
+  x <- seq(0,a,length=N+1)[1:N]
+  
+  return(list(x=x,rr=rr,G=G))
+}
