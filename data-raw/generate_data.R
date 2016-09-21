@@ -11,8 +11,6 @@
 # 
 #   save(anomalous_data,file="data/anomalous_data.RData")
 #
-# The following commented lines are meant to use roxygen2 to
-# build up documentation for anomalous_data
 
 
   
@@ -61,7 +59,7 @@ generate_atoms_dataframe <- function()
   anumbers <- c(1:30,54)
 
   # Dataframe including atom names and numbers
-  atoms <- data.frame(anames=anames,Z=anumbers)
+  atoms <- data.frame(anames=I(anames),Z=anumbers)
   
   # Save as file Rda
   save(atoms,file="data/atoms.RData")
