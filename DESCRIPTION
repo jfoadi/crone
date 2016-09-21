@@ -10,4 +10,5 @@ Description: crone contains functions and data to carry out all major structural
     crystallography calculations in one dimension.
 License: GPL-2
 LazyLoad: yes
+LazyData: true
 RoxygenNote: 5.0.1
