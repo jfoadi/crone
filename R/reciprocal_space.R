@@ -349,3 +349,65 @@ FToRho <- function(a,F,hidx,N)
   
   return(list(x=x,rr=rr,G=G))
 }
+
+
+#' Find optimal wavelength for anomalous phasing
+#' 
+#' This function mimics the behaviour of the fluorescent scan operated at
+#' synchrotron beamlines to find out the optimal wavelength which maximises
+#' the anomalous signal used to phase a structure.
+#' 
+#' @param chem_el 1- or 2-letters character string. The chemical symbol of
+#'    interest.
+#' @param lambda_range Real vector of length 2. The two values are the extremes of
+#'    the wavelength window inside which to carry out the search. Default is
+#'    for the search to be carried out across the full available range.
+#' @return A named list with two elements: 1) idx is the integer indicating the
+#'    row in the anomalous_data dataframe related to the specific chemical
+#'    element, corresponding to the optimal wavelength; 2) the optimal wavelength
+#'    in angstroms.
+#' @examples 
+#' # Optimal wavelength for iron
+#' lFe <- fluorescent_scan("Fe")
+#' print(lFe$lambda)
+#' idx <- lFe$idx
+#' 
+#' # Load anomalous dataframe for Fe
+#' adFe <- load_anomalous_data("Fe")
+#' print(adFe[idx,])  # Same wavelength as before!
+#' 
+#' # Optimal wavelength with window restriction
+#' lFe <- fluorescent_scan("Fe",lambda_range=c(6,8))
+#' print(lFe$lambda)
+#' 
+#' @export
+fluorescent_scan <- function(chem_el,lambda_range=NULL)
+{
+  # Load table related to specific chemical element
+  ad <- load_anomalous_data(chem_el)
+  
+  # Restrict search to lambda_range
+  if (!is.null(lambda_range))
+  {
+    lset <- which(ad$lambda >= lambda_range[1])
+    rset <- which(ad$lambda <= lambda_range[2])
+    jdx <- na.omit(match(lset,rset))
+  }
+  if (is.null(lambda_range)) jdx <- 1:length(ad[,1])
+  
+  # Find minimum of f' and select interval around it
+  idx <- which(ad[jdx,2] == min(ad[jdx,2]))
+  il <- idx-10
+  if (il < 1) il <- 1
+  ir <- idx+10
+  if (ir > length(jdx)) ir <- length(jdx)
+  
+  # Select wavelength at which the difference between f' 
+  # and f'' is largest
+  tmp <- abs(ad[jdx[il]:jdx[ir],2]-ad[jdx[il]:jdx[ir],3])
+  idx <- which(tmp == max(tmp))
+  Clambda <- ad[jdx[il]+idx-1,1]
+  idx <- which(abs(ad$lambda-Clambda) < 0.000001)
+  
+  return(list(idx=idx,lambda=ad[idx,1]))
+}
