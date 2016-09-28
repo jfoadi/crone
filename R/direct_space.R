@@ -62,7 +62,7 @@ Kgauss <- function(sigma,a)
   return(K)
 }
 
-#' Cold gaussian atom
+#' Gaussian atom
 #' 
 #' @param x  Point in the 1D cell at which this function is calculated.
 #' @param a  A real number. The width of the unit cell in which the gaussian
@@ -70,6 +70,9 @@ Kgauss <- function(sigma,a)
 #' @param  x0  A real number. The point corresponding to the atom's peak.
 #' @param Z  An integer number. Z is the atomic number of the atom (Z(H)=1,
 #' Z(He)=2,Z(Li)=3,Z(B)=4, etc).
+#' @param B A real number. This is the B factor characterizing the atom's
+#'    thermal agitation. It is given as B=8*pi^2*U, where U is the variance
+#'    of the position of the atoms' nucleus around the equilibrium position.
 #' @param k  A real number. It controls the standard deviation of the 
 #' gaussian function describing the atom and, thus, the shape of the
 #' associated peak. The standard deviation sigma is given by:
@@ -83,16 +86,22 @@ Kgauss <- function(sigma,a)
 #' x0 <- 5
 #' Z <- 6
 #' x <- seq(0,a,length=1000)
-#' rho <- cold_atom_gauss(x,a,x0,Z)
+#' rho <- atom_gauss(x,a,x0,Z)
 #' plot(x,rho,type="l",xlab="x",ylab=expression(rho))
 #' @export
-cold_atom_gauss <- function(x,a,x0=0,Z=1,k=ksigma)
+atom_gauss <- function(x,a,x0=0,Z=1,B=0,k=ksigma)
 {
-  # Find sigma
-  sigma <- k*sqrt(Z)
+  # Find sigma of cold atom
+  sigma0 <- k*sqrt(Z)
   
-  # Integration constant
-  K <- Kgauss(sigma,a)
+  # Variance of atomic thermal displacement
+  U <- B/(8*pi^2)
+  
+  # Sigma of thermal atom to take B into account
+  sigma <- sqrt(U+sigma0^2)
+  
+  # Integration constant (including thermal correction factor)
+  K <- Kgauss(sigma0,a)*sigma0/sigma
   
   # Shift x0 if outside interval [0,a]
   y0 <- x0%%a

@@ -2,8 +2,8 @@
 
 export(FToRho)
 export(Kgauss)
+export(atom_gauss)
 export(choose_a)
-export(cold_atom_gauss)
 export(expand_to_cell)
 export(fluorescent_scan)
 export(load_anomalous_data)
