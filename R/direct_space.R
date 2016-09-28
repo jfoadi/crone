@@ -399,3 +399,77 @@ reduce_to_asu <- function(a,vx0,vZ,vB,vocc,SG="P1")
   
   return(list(vx0=vx0,vZ=vZ,vB=vB,vocc=vocc))
 }
+
+
+#' Structure of gaussian atoms
+#' 
+#' Structure formed by all gaussian atoms in the unit cell. Positions, atomic
+#' numbers and thermal factors are given by vectors of a same length. Each
+#' atom forming the structure is also characterised by a given occupancy (between
+#' 0 and 1).
+#' 
+#' @param x  Point in the 1D cell at which this function is calculated.
+#' @param a  A real number. The width of the unit cell in which the gaussian
+#' atom is placed.
+#' @param vx0 Vector of real numerics. Atom positions in the unit cell.
+#' @param vZ Vector of integers. Atomic numbers of all atoms in the
+#'  unit cell.
+#' @param vB Vector of real numerics. B factors for all atoms in the
+#'  unit cell.
+#' @param vocc Vector of real numerics. Occupancies (value between 0
+#'  and 1) for all atoms in the unit cell.
+#' @param k  A real number. It controls the standard deviation of the 
+#' gaussian function describing the atom and, thus, the shape of the
+#' associated peak. The standard deviation sigma is given by:
+#'          \code{sigma = k * sqrt(Z)}
+#' 
+#' @return A vector of length equal to the length of vector x, with
+#' values equal to the evaluated gaussian atom.
+#'
+#' @examples 
+#' # Cell, atom types, positions and B factors
+#' a <- 10
+#' vx0 <- c(2,5,7)
+#' vZ <- c(6,16,8)
+#' vB <- c(0,0,0)
+#' 
+#' # All occupancies to 1
+#' vocc <- c(1,1,1)
+#' 
+#' # Grid for unit cell
+#' x <- seq(0,a,length=1000)
+#' 
+#' # Structure density
+#' rho <- structure_gauss(x,a,vx0,vZ,vB,vocc)
+#' plot(x,rho,type="l",xlab="x",ylab=expression(rho))
+#' 
+#' # Now reduce occupancy of sulphure
+#' vocc[2] <- 0.5
+#' rho <- structure_gauss(x,a,vx0,vZ,vB,vocc)
+#' points(x,rho,type="l",col=2)
+#' 
+#' # Increase temperature of oxygen
+#' vB[3] <- 10
+#' rho <- structure_gauss(x,a,vx0,vZ,vB,vocc)
+#' points(x,rho,type="l",col=3)
+#' 
+#' @export
+structure_gauss <- function(x,a,vx0,vZ,vB,vocc,k=ksigma)
+{
+  # Check on arrays length
+  if ((length(vZ) != length(vx0)) |
+      (length(vB) != length(vx0)) |
+      (length(vocc) != length(vx0)))
+    stop("Input arrays must all have same size.")
+  
+  # Initialise density
+  rho <- rep(0,times=length(x))
+  
+  # Cycle through all atoms to increment density
+  for (i in 1:length(vx0))
+  {
+    rho <- rho+vocc[i]*atom_gauss(x,a,vx0[i],vZ[i],vB[i],k)
+  }
+  
+  return(rho)
+}
