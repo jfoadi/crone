@@ -322,24 +322,42 @@ FToRho <- function(a,F,hidx,N)
     stop("Arrays do not have same length")
   
   # Check numbers are compatible
-  hmax <- max(hidx)
+  hmax <- max(abs(hidx))
   if (hmax >= 0.5*N) stop("Grid too coarse. Increase N.")
+  
+  # Prepare appropriate Miller indices and structure factors arrays,
+  # if needed (averaging)
+  nhidx <- 0:hmax
+  nF <- rep(as.complex(0),length=(hmax+1))
+  idx0 <- which(hidx == 0)
+  if (length(idx0) > 0) nF[1] <- F[idx0]
+  for (h in 1:hmax)
+  {
+    k <- h+1
+    idxP <- which(hidx == h)
+    idxM <- which(hidx == -h)
+    if (length(idxP) > 0 & length(idxM) > 0)
+    {
+      nF[k] <- 0.5*(F[idxP]+Conj(F[idxM]))
+    }
+    if (length(idxP) > 0 & length(idxM) == 0)
+    {
+      nF[k] <- F[idxP]
+    }
+    if (length(idxP) == 0 & length(idxM) > 0)
+    {
+      nF[k] <- Conj(F[idxM])
+    }
+  }
   
   # Initialise fft array
   G <- rep(0,length=N)
   
   # Fill fft array with structure factors
-  G[hidx+1] <- F
-  if (hidx[1] == 0) 
-  {
-    kidx <- N-hidx[2:length(hidx)]+1
-    G[kidx] <- Conj(F[2:length(F)])
-  }
-  if (hidx[1] != 0)
-  {
-    kidx <- N-hidx+1
-    G[kidx] <- Conj(F)
-  }
+  G[nhidx+1] <- nF
+  if (nhidx[1] == 0) 
+    kidx <- N-nhidx[2:length(nhidx)]+1
+  G[kidx] <- Conj(nF[2:length(nF)])
   
   # Density via fft
   rr <- Re(fft(G))/a
