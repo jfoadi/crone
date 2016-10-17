@@ -429,3 +429,152 @@ fluorescent_scan <- function(chem_el,lambda_range=NULL)
   
   return(list(idx=idx,lambda=ad[idx,1]))
 }
+
+
+#' Generation of structure factors with errors
+#' 
+#' This function generates structure factors calculated starting from
+#' the given structure and subject to two types of errors: poissonian
+#' counting errors due to the statistical nature of the photons hitting
+#' the crystal and normal errors due to the slight random shifting of
+#' atoms position in all the unit cells forming the lattice.
+#' 
+#' @param h Real numeric. One or more 1D Miller indices.
+#' @param a A real number. The unit cell side length.
+#' @param vx0 Vector of real numerics. Atom positions in the asymmetric
+#'  unit.
+#' @param vZ Vector of integers. Atomic numbers of all atoms in the
+#'  asymmetric unit.
+#' @param vB Vector of real numerics. B factors for all atoms in the
+#'  asymmetric unit.
+#' @param vocc Vector of real numerics. Occupancies (value between 0
+#'  and 1) for all atoms in the asymmetric unit. In this function there
+#'  is no mechanism to check whether the occupancy is appropriate in case
+#'  the atom is at a special position.
+#' @param vx0err A real number. The standard deviation of the random 
+#'  displacement of all atoms composing the structure from their correct
+#'  position. Default value is NULL, corresponding to the generation of
+#'  structure factors, with no errors, from the correct structure.
+#' @param ntrialP Integer. The number of simulated Poisson counts for each
+#'    set of structure factor amplitudes. More counts (high ntrialP) return
+#'    smaller errors for the structure factor amplitudes.
+#' @param ntrialG Integer. This is the number of randomly generated shifts of
+#'    each atom of the structure from its true position. The shifts follow a
+#'    gaussian distribution with mean 0 and standard deviation vx0err.
+#' @return  A named list with two elements:
+#'  \itemize{
+#'    \item{F. Array of mean structure factor amplitudes, among all structure
+#'             factor arrays simulated with specific errors.}
+#'    \item{sF.  Array of structure factors errors. These coincide with the
+#'               standard deviations of all structure factors arrays simulated
+#'               with specific errors.}
+#'         }
+#' 
+#' @examples 
+#' 
+#' # Load thiocyanate data
+#' datadir <- system.file("extdata",package="crone")
+#' filename <- file.path(datadir,"thiocyanate_x.dat")
+#' ltmp <- read_x(filename)
+#' a <- ltmp$a
+#' SG <- ltmp$SG
+#' print(SG) # The structure is P1, so we don't need symmetry expansion
+#' vx0 <- ltmp$data$x0
+#' vZ <- ltmp$data$Z
+#' vB <- ltmp$data$B
+#' vocc <- ltmp$data$occ
+#' 
+#' # Miller indices used
+#' hidx <- 1:10
+#' 
+#' # Correct amplitudes and phases
+#' F <- strufac(hidx,a,vx0,vZ,vB,vocc)
+#' Ftrue <- Mod(F)
+#' phitrue <- Arg(F)
+#' 
+#' # Only poissonian errors
+#' ltmp <- SFobs(hidx,a,vx0,vZ,vB,vocc,ntrialP=2)
+#' print(names(ltmp))
+#' F <- ltmp$F
+#' Fpois <- Mod(F)
+#' 
+#' # True density
+#' rtmptrue <- FToRho(a,complex(length.out=length(hidx),modulus=Ftrue,
+#'  argument=phitrue),hidx,1000)
+#' plot(rtmptrue$x,rtmptrue$rr,type="l",xlab="x",ylab=expression(rho),lwd=3)
+#' 
+#' # Density with poissonian errors
+#' rtmppois <- FToRho(a,complex(length.out=length(hidx),modulus=Fpois,
+#'  argument=phitrue),hidx,1000)
+#' points(rtmppois$x,rtmppois$rr,type="l",
+#'  lty=2,col=2,lwd=2) # Very small differences
+#' 
+#' # Only random atomic errors with standard deviation 0.3 angstroms
+#' ltmp <- SFobs(hidx,a,vx0,vZ,vB,vocc,ntrialP=0,vx0err=0.3)
+#' F <- ltmp$F
+#' Fcoords <- Mod(F)
+#' 
+#' # Density with gaussian errors on atom coordinates
+#' rtmpcoords <- FToRho(a,complex(length.out=length(hidx),
+#'  modulus=Fcoords,argument=phitrue),hidx,1000)
+#' points(rtmpcoords$x,rtmpcoords$rr,type="l",
+#'  lty=3,col=3,lwd=2) # Larger differences
+#' @export
+SFobs <- function(h,a,vx0,vZ,vB,vocc,vx0err=NULL,ntrialP=100,ntrialG=100)
+{
+  # Initial sf and errors
+  tmp <- strufac(hidx,a,vx0,vZ,vB,vocc)
+  Fobs <- Mod(tmp)
+  rm(tmp)
+  Ffinal1 <- Fobs
+  sFfinal1 <- rep(0,times=length(hidx))
+  Ffinal2 <- Fobs
+  sFfinal2 <- rep(0,times=length(hidx))
+  
+  # Find scales for pure-amplitudes noise (if needed)
+  if (ntrialP > 0)
+  {
+    # Scale and shift Fobs interval to increase precision
+    # for weak intensities
+    M <- max(Fobs,na.rm=TRUE)
+    m <- min(Fobs,na.rm=TRUE)
+    b <- M-m
+    newF <- 1000+1000*(Fobs-m)/b
+    
+    # Poissonians errors
+    F <- rep(0,times=length(Fobs))
+    sF <- rep(0,times=length(Fobs))
+    for (i in 1:length(hidx))
+    {
+      tmp <- rpois(n=ntrialP,lambda=round(newF[i],digits=0))
+      F[i] <- m+(M-m)*(mean(tmp)-1000)/1000
+      sF[i] <- abs((M-m)*sd(tmp)/1000)
+    }
+    rm(newF,tmp)
+    Ffinal1 <- F
+    sFfinal1 <- sF
+    rm(F,sF)
+  }
+  
+  # If atoms in the structure are affected by errors
+  if (!is.null(vx0err))
+  {
+    # New atomic data
+    nx0 <- vx0
+    Fmatrix <- matrix(nrow=ntrialG,ncol=length(Fobs))
+    for (itrial in 1:ntrialG)
+    {
+      if (!is.null(vx0err)) nx0 <- vx0+rnorm(n=length(vx0),sd=vx0err)
+      tmp <- strufac(hidx,a,nx0,vZ,vB,vocc)
+      Fmatrix[itrial,] <- Mod(tmp)
+    }
+    Ffinal2 <- apply(Fmatrix,2,mean,na.rm=TRUE)
+    sFfinal2 <- apply(Fmatrix,2,sd,na.rm=TRUE)
+  }
+  
+  # Joining the two contributions into one
+  Ffinal <- 0.5*(Ffinal1+Ffinal2)
+  sFfinal <- sqrt(sFfinal1^2+sFfinal2^2)
+  
+  return(list(F=Ffinal,sF=sFfinal))
+}
