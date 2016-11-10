@@ -63,7 +63,28 @@ local_maxima <- function(x)
   return(y)
 }
 
-# Heaviside function
+
+#' Heaviside function (step function)
+#'
+#' @param x  A vector of real numbers.
+#' @param x0 A real number. The x value at which the function step occurs.
+#' @return One of the two numbers 0 or 1.
+#' @examples 
+#' x <- seq(-3,5,length=1000)
+#' x0 <- 1
+#' y <- heaviside(x,x0)
+#' plot(x,y,type="l")
+#' # Step up and step down
+#' x1 <- seq(-3,5,length=1000)
+#' x10 <- 1
+#' y1 <- heaviside(x1,x10)
+#' x2 <- seq(1,9,length=1000)
+#' x20 <- 5
+#' y2 <- heaviside(x2,x20)
+#' y2 <- 1-y2
+#' plot(x1,y1,type="l",xlim=c(-3,9),xlab="x",ylab="y")
+#' points(x2,y2,type="l")
+#' @export
 heaviside <- function(x,x0=0)
 {
   value <- (sign(x-x0)+1)/2
@@ -71,7 +92,18 @@ heaviside <- function(x,x0=0)
   return(value)
 }
 
-# Error funtion
+
+#' Error function for real values
+#'
+#' @param x  A vector of real numbers. 
+#' @return A real number. The integral of the gaussian, centred on zero and
+#'    with standard deviation equal to 1, between 0 and x, multiplied by
+#'    2/sqrt(pi).
+#' @examples 
+#' x <- seq(-1,1,length=1000)
+#' y <- erf(x)
+#' plot(x,y,type="l")
+#' @export
 erf <- function(x)
 {
   value <- 2 * pnorm(x * sqrt(2)) - 1
