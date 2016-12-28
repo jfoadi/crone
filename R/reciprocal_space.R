@@ -145,17 +145,22 @@ plot_absorption_curves <- function(chem_el,zoom=NULL)
 #' symmetry will have to be expanded first with function "expand_to_cell".
 #' 
 #' @param h Real numeric. One or more 1D Miller indices.
-#' @param a A real number. The unit cell side length.
-#' @param vx0 Vector of real numerics. Atom positions in the asymmetric
-#'  unit.
-#' @param vZ Vector of integers. Atomic numbers of all atoms in the
-#'  asymmetric unit.
-#' @param vB Vector of real numerics. B factors for all atoms in the
-#'  asymmetric unit.
-#' @param vocc Vector of real numerics. Occupancies (value between 0
-#'  and 1) for all atoms in the asymmetric unit. In this function there
-#'  is no mechanism to check whether the occupancy is appropriate in case
-#'  the atom is at a special position.
+#' @param sdata A named list, normally obtained through the use of
+#'  functions \code{\link{read_x}} or \code{\link{standardise_sdata}}. 
+#'  The list names correspond to different object types:
+#'  \itemize{
+#'    \item{a.     Real numeric. The size of the unit cell.}
+#'    \item{SG.    Character string. Space group symbol; either "P1" 
+#'                 or "P-1"}
+#'    \item{x0.    Vector of real numerics indicating the expanded atomic
+#'                 positions in the unit cell.}
+#'    \item{Z.     Vector of integers indicating the expanded 
+#'                 atomic numbers for all atoms in the unit cell.}
+#'    \item{B.    Vector of real numerics indicating the expanded 
+#'                B factors for all atoms in the unit cell.}
+#'    \item{occ.  Vector of real numerics indicating the expanded 
+#'                occupancies for all atoms in the unit cell.}
+#'  }
 #' @param anoflag Logical variable. If TRUE it forces scattering factors
 #'    to include anomalous contributions. As a consequence, Friedel's
 #'    pairs will not be equal.
@@ -180,36 +185,60 @@ plot_absorption_curves <- function(chem_el,zoom=NULL)
 #' @examples 
 #' # First create the crystal structure (P1)
 #' a <- 10
-#' vx0 <- c(1,4,6.5)
-#' vZ <- c(8,26,6)
-#' vB <- c(18,20,17)
-#' vocc <- c(1,1,1)
+#' SG <- "P1"
+#' x0 <- c(1,4,6.5)
+#' Z <- c(8,26,6)
+#' B <- c(18,20,17)
+#' occ <- c(1,1,1)
+#' sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
 #' lbda <- 1.7   # Close to Fe's absorption
 #' 
 #' # Miller indices (including DC (h=0) component)
 #' hidx <- 0:10
 #' 
 #' # Now structure factors without anomalous contribution
-#' F <- strufac(hidx,a,vx0,vZ,vB,vocc,lbda=lbda)
+#' F <- strufac(hidx,sdata,lbda=lbda)
 #' print(length(F))  # Includes DC component (h=0)
 #' print(F[1])       # DC component is real
 #' print(Mod(F))     # Amplitudes decrease with increasing
 #'                   # resolution (Miller indices)
 #'                   
 #' # Now try with anomalous contributions
-#' F <- strufac(hidx,a,vx0,vZ,vB,vocc,lbda=lbda,anoflag=TRUE)
+#' F <- strufac(hidx,sdata,lbda=lbda,anoflag=TRUE)
 #' print(F[0])  # DC component is not any longer real
 #' 
 #' @export
-strufac <- function(h,a,vx0,vZ,vB,vocc,anoflag=FALSE,
+strufac <- function(h,sdata,anoflag=FALSE,
                     aK=anoK,lbda=1.0,k=ksigma,f1f2out=TRUE)
 {
-  if (length(vx0) != length(vZ)) 
-    stop("Atomic center and atomic number lengths differ!")
-  if (length(vx0) != length(vB))
-    stop("Atomic center and B-factors lengths differ!")
-  if (length(vx0) != length(vocc))
-    stop("Atomic center and atomic occupanciess lengths differ!")
+  # Check input object is the right one
+  in_names <- names(sdata)
+  if (length(in_names) != 6) stop("Wrong input object.")
+  if (in_names[1] != "a" | in_names[2] != "SG" | in_names[3] != "x0" |
+      in_names[4] != "Z" | in_names[5] != "B" | in_names[6] != "occ")
+  {
+    stop("Wrong input object.")
+  }
+  
+  # Check on arrays length
+  if ((length(sdata$Z) != length(sdata$x0)) |
+      (length(sdata$B) != length(sdata$x0)) |
+      (length(sdata$occ) != length(sdata$x0)))
+  {
+    stop("Last 4 arrays in input object must all have same size.")
+  }
+  
+  # Data Ok. Carry on.
+  
+  # Expand to P1
+  sdata <- expand_to_cell(sdata)
+  
+  # Copy arrays
+  a <- sdata$a
+  vx0 <- sdata$x0
+  vZ <- sdata$Z
+  vB <- sdata$B
+  vocc <- sdata$occ
   
   # If anomalous flag is on collect f' and f" for each 
   # atomic species
@@ -273,7 +302,7 @@ strufac <- function(h,a,vx0,vZ,vB,vocc,anoflag=FALSE,
 }
 
 
-#' From structure factors to density
+#' From structure factors to density using Fourier synthesis
 #' 
 #' Given a set of complex structure factors corresponding to a set of 1D
 #' Miller indices, the length of the 1D unit cell, the set of Miller indices
@@ -293,29 +322,31 @@ strufac <- function(h,a,vx0,vZ,vB,vocc,anoflag=FALSE,
 #' @examples 
 #' # First create the crystal structure (in P1)
 #' a <- 10
-#' vx0 <- c(1,4,6.5)
-#' vZ <- c(8,26,6)
-#' vB <- c(18,20,17)
-#' vocc <- c(1,1,1)
+#' SG <- "P1"
+#' x0 <- c(1,4,6.5)
+#' Z <- c(8,26,6)
+#' B <- c(18,20,17)
+#' occ <- c(1,1,1)
+#' sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
 #' 
 #' # Enough Fourier components (Miller indices)
 #' hidx <- 0:20
 #' 
 #' # Compute the structure factors
-#' F <- strufac(hidx,a,vx0,vZ,vB,vocc)
+#' F <- strufac(hidx,sdata)
 #' 
 #' # Number of grid points
-#' N <- 100
+#' N <- 1000
 #' 
 #' # Density
-#' rtmp <- FToRho(a,F,hidx,N)
+#' rtmp <- fousynth(a,F,hidx,N)
 #' 
 #' # Density plot in the unit cell
 #' x <- rtmp$x
 #' rho <- rtmp$rr
 #' plot(x,rho,type="l",xlab="x",ylab=expression(rho))
 #' @export
-FToRho <- function(a,F,hidx,N)
+fousynth <- function(a,F,hidx,N)
 {
   # Arrays checks
   if (length(F) != length(hidx))
@@ -439,33 +470,58 @@ fluorescent_scan <- function(chem_el,lambda_range=NULL)
 #' the crystal and normal errors due to the slight random shifting of
 #' atoms position in all the unit cells forming the lattice.
 #' 
-#' @param h Real numeric. One or more 1D Miller indices.
-#' @param a A real number. The unit cell side length.
-#' @param vx0 Vector of real numerics. Atom positions in the asymmetric
-#'  unit.
-#' @param vZ Vector of integers. Atomic numbers of all atoms in the
-#'  asymmetric unit.
-#' @param vB Vector of real numerics. B factors for all atoms in the
-#'  asymmetric unit.
-#' @param vocc Vector of real numerics. Occupancies (value between 0
-#'  and 1) for all atoms in the asymmetric unit. In this function there
-#'  is no mechanism to check whether the occupancy is appropriate in case
-#'  the atom is at a special position.
+#' @param hidx Real numeric. One or more 1D Miller indices.
+#' @param sdata A named list, normally obtained through the use of
+#'  function \code{\link{read_x}} or \code{\link{standardise_sdata}}. 
+#'  The list names correspond to different object types:
+#'  \itemize{
+#'    \item{a.     Real numeric. The size of the unit cell.}
+#'    \item{SG.    Character string. Space group symbol; either "P1" 
+#'                 or "P-1"}
+#'    \item{x0.    Vector of real numerics indicating the expanded atomic
+#'                 positions in the unit cell.}
+#'    \item{Z.     Vector of integers indicating the expanded 
+#'                 atomic numbers for all atoms in the unit cell.}
+#'    \item{B.    Vector of real numerics indicating the expanded 
+#'                B factors for all atoms in the unit cell.}
+#'    \item{occ.  Vector of real numerics indicating the expanded 
+#'                occupancies for all atoms in the unit cell.}
+#'  }
 #' @param vx0err A real number. The standard deviation of the random 
 #'  displacement of all atoms composing the structure from their correct
 #'  position. Default value is NULL, corresponding to the generation of
 #'  structure factors, with no errors, from the correct structure.
 #' @param ntrialP Integer. The number of simulated Poisson counts for each
 #'    set of structure factor amplitudes. More counts (high ntrialP) return
-#'    smaller errors for the structure factor amplitudes.
+#'    smaller errors for the structure factor amplitudes. If ntrialP less or 
+#'    equal 0, then poissonian counting errors are not generated.
 #' @param ntrialG Integer. This is the number of randomly generated shifts of
 #'    each atom of the structure from its true position. The shifts follow a
 #'    gaussian distribution with mean 0 and standard deviation vx0err.
+#' @param anoflag Logical variable. If TRUE it forces scattering factors
+#'    to include anomalous contributions. As a consequence, theoretical
+#'    Friedel's pairs will not be equal.
+#' @param aK Real numeric. This is a fudge factor included to decrease the
+#'    strength of the anomalous contributions. Without aK the strength is too
+#'    high for 1D structures, compared to real 3D structures. So aK helps
+#'    bringing down the anomalous contribution within the 5%-10% normally
+#'    met with large-size structures. The default value is aK=0.3 (anoK is
+#'    included as internal data).
+#' @param lbda Real numeric. This is the wavelength in angstroms. Its value
+#'    is important in relation to anomalous scattering.
+#' @param k A real number. It controls the standard deviation of the 
+#'    gaussian function describing the atom and, thus, the shape of the
+#'    associated peak. The standard deviation sigma is given by:
+#'          \code{sigma = k * sqrt(Z)}
+#'    The default value is k=0.05 (ksigma is included as internal data).
+#' @param f1f2out Logical variable. This variable controls output of a small
+#'    table of f' and f'' values for all chemical elements in the structure.
+#'    Default is for the table to be printed.
 #' @return  A named list with two elements:
 #'  \itemize{
-#'    \item{F. Array of mean structure factor amplitudes, among all structure
+#'    \item{F Array of mean structure factor amplitudes, among all structure
 #'             factor arrays simulated with specific errors.}
-#'    \item{sF.  Array of structure factors errors. These coincide with the
+#'    \item{sF  Array of structure factors errors. These coincide with the
 #'               standard deviations of all structure factors arrays simulated
 #'               with specific errors.}
 #'         }
@@ -473,57 +529,69 @@ fluorescent_scan <- function(chem_el,lambda_range=NULL)
 #' @examples 
 #' 
 #' # Load thiocyanate data
-#' datadir <- system.file("extdata",package="crone")
-#' filename <- file.path(datadir,"thiocyanate_x.dat")
-#' ltmp <- read_x(filename)
-#' a <- ltmp$a
-#' SG <- ltmp$SG
-#' print(SG) # The structure is P1, so we don't need symmetry expansion
-#' vx0 <- ltmp$data$x0
-#' vZ <- ltmp$data$Z
-#' vB <- ltmp$data$B
-#' vocc <- ltmp$data$occ
+#' sdata <- load_structure("thiocyanate")
 #' 
 #' # Miller indices used
 #' hidx <- 1:10
 #' 
 #' # Correct amplitudes and phases
-#' F <- strufac(hidx,a,vx0,vZ,vB,vocc)
+#' F <- strufac(hidx,sdata)
 #' Ftrue <- Mod(F)
 #' phitrue <- Arg(F)
 #' 
 #' # Only poissonian errors
-#' ltmp <- SFobs(hidx,a,vx0,vZ,vB,vocc,ntrialP=2)
+#' ltmp <- sfobs(hidx,sdata,ntrialP=2)
 #' print(names(ltmp))
 #' F <- ltmp$F
 #' Fpois <- Mod(F)
 #' 
 #' # True density
-#' rtmptrue <- FToRho(a,complex(length.out=length(hidx),modulus=Ftrue,
-#'  argument=phitrue),hidx,1000)
-#' plot(rtmptrue$x,rtmptrue$rr,type="l",xlab="x",ylab=expression(rho),lwd=3)
+#' rtmptrue <- fousynth(sdata$a,complex(length.out=length(hidx),
+#'  modulus=Ftrue,argument=phitrue),hidx,1000)
+#' plot(rtmptrue$x,rtmptrue$rr,type="l",xlab="x",ylab=expression(rho),
+#'  lwd=3)
 #' 
 #' # Density with poissonian errors
-#' rtmppois <- FToRho(a,complex(length.out=length(hidx),modulus=Fpois,
-#'  argument=phitrue),hidx,1000)
+#' rtmppois <- fousynth(sdata$a,complex(length.out=length(hidx),
+#'  modulus=Fpois,argument=phitrue),hidx,1000)
 #' points(rtmppois$x,rtmppois$rr,type="l",
 #'  lty=2,col=2,lwd=2) # Very small differences
 #' 
 #' # Only random atomic errors with standard deviation 0.3 angstroms
-#' ltmp <- SFobs(hidx,a,vx0,vZ,vB,vocc,ntrialP=0,vx0err=0.3)
+#' ltmp <- sfobs(hidx,sdata,ntrialP=0,vx0err=0.3)
 #' F <- ltmp$F
 #' Fcoords <- Mod(F)
 #' 
 #' # Density with gaussian errors on atom coordinates
-#' rtmpcoords <- FToRho(a,complex(length.out=length(hidx),
+#' rtmpcoords <- fousynth(sdata$a,complex(length.out=length(hidx),
 #'  modulus=Fcoords,argument=phitrue),hidx,1000)
 #' points(rtmpcoords$x,rtmpcoords$rr,type="l",
 #'  lty=3,col=3,lwd=2) # Larger differences
 #' @export
-SFobs <- function(h,a,vx0,vZ,vB,vocc,vx0err=NULL,ntrialP=100,ntrialG=100)
+sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
+                  anoflag=FALSE,aK=anoK,lbda=1,k=ksigma,f1f2out=TRUE)
 {
+  # Check input object is the right one
+  in_names <- names(sdata)
+  if (length(in_names) != 6) stop("Wrong input object.")
+  if (in_names[1] != "a" | in_names[2] != "SG" | in_names[3] != "x0" |
+      in_names[4] != "Z" | in_names[5] != "B" | in_names[6] != "occ")
+  {
+    stop("Wrong input object.")
+  }
+  
+  # Check on arrays length
+  if ((length(sdata$Z) != length(sdata$x0)) |
+      (length(sdata$B) != length(sdata$x0)) |
+      (length(sdata$occ) != length(sdata$x0)))
+  {
+    stop("Last 4 arrays in input object must all have same size.")
+  }
+  
+  # Data Ok. Carry on.
+  
   # Initial sf and errors
-  tmp <- strufac(hidx,a,vx0,vZ,vB,vocc)
+  tmp <- strufac(hidx,sdata,anoflag,aK,lbda,k,f1f2out)
   Fobs <- Mod(tmp)
   rm(tmp)
   Ffinal1 <- Fobs
@@ -560,12 +628,15 @@ SFobs <- function(h,a,vx0,vZ,vB,vocc,vx0err=NULL,ntrialP=100,ntrialG=100)
   if (!is.null(vx0err))
   {
     # New atomic data
-    nx0 <- vx0
+    nx0 <- sdata$x0
     Fmatrix <- matrix(nrow=ntrialG,ncol=length(Fobs))
     for (itrial in 1:ntrialG)
     {
-      if (!is.null(vx0err)) nx0 <- vx0+rnorm(n=length(vx0),sd=vx0err)
-      tmp <- strufac(hidx,a,nx0,vZ,vB,vocc)
+      tmpadata <- sdata
+      if (!is.null(vx0err)) nx0 <- sdata$x0+rnorm(n=length(sdata$x0),
+                                                  sd=vx0err)
+      tmpadata$x0 <- nx0
+      tmp <- strufac(hidx,tmpadata,anoflag,aK,lbda,k,f1f2out)
       Fmatrix[itrial,] <- Mod(tmp)
     }
     Ffinal2 <- apply(Fmatrix,2,mean,na.rm=TRUE)

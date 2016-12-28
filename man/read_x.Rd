@@ -18,9 +18,14 @@ A named list with the following elements:
                possible when working within 1D crystallography, P1 (no 
                symmetry) and P-1 (inversion through the origin). SG can be 
                either "P1" or "P-1".}
-   \item{data. Data frame with columns having the following names: x0 (atom
-               coordinates), Z (atomic numbers), B (B-factors), 
-               occ (occupancies).}
+   \item{x0.    Vector of real numerics indicating the expanded atomic
+                positions in the unit cell.}
+   \item{Z.     Vector of integers indicating the expanded 
+                atomic numbers for all atoms in the unit cell.}
+   \item{B.    Vector of real numerics indicating the expanded 
+               B factors for all atoms in the unit cell.}
+   \item{occ.  Vector of real numerics indicating the expanded 
+               occupancies for all atoms in the unit cell.}
          }
 }
 \description{
@@ -30,9 +35,9 @@ parameters from a coordinate file.
 \examples{
 datadir <- system.file("extdata",package="crone")
 filename <- file.path(datadir,"carbon_dioxide_x.dat")
-ltmp <- read_x(filename)
-print(names(ltmp))
-print(ltmp$data)
+sdata <- read_x(filename)
+print(names(sdata))
+print(sdata)
 
 }
 

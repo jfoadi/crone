@@ -4,10 +4,10 @@
 \alias{choose_a}
 \title{Suggests unit cell side, a, based on atom content}
 \usage{
-choose_a(vZ, D, SG = "P1", k = ksigma, Ma = 5)
+choose_a(Z, D, SG = "P1", k = ksigma, Ma = 5)
 }
 \arguments{
-\item{vZ}{A vector of atom Z numbers.}
+\item{Z}{A vector of atom Z numbers.}
 
 \item{D}{A real number. The distance between the two furthest atoms
 in the cell.}
@@ -37,10 +37,10 @@ sigma. If the "P-1" symmetry is present, D is doubled.
 }
 \examples{
 # 2 carbon atoms, a sulphur and an oxygen
-vZ <- c(6,8,16,6)
+Z <- c(6,8,16,6)
 
 # Distance between the two carbons is 15 angstroms
 D <- 15
-a <- choose_a(vZ,D)
+a <- choose_a(Z,D)
 }
 

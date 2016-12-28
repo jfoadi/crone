@@ -4,27 +4,28 @@
 \alias{strufac}
 \title{Calculation of structure factors}
 \usage{
-strufac(h, a, vx0, vZ, vB, vocc, anoflag = FALSE, aK = anoK, lbda = 1,
-  k = ksigma, f1f2out = TRUE)
+strufac(h, sdata, anoflag = FALSE, aK = anoK, lbda = 1, k = ksigma,
+  f1f2out = TRUE)
 }
 \arguments{
 \item{h}{Real numeric. One or more 1D Miller indices.}
 
-\item{a}{A real number. The unit cell side length.}
-
-\item{vx0}{Vector of real numerics. Atom positions in the asymmetric
-unit.}
-
-\item{vZ}{Vector of integers. Atomic numbers of all atoms in the
-asymmetric unit.}
-
-\item{vB}{Vector of real numerics. B factors for all atoms in the
-asymmetric unit.}
-
-\item{vocc}{Vector of real numerics. Occupancies (value between 0
-and 1) for all atoms in the asymmetric unit. In this function there
-is no mechanism to check whether the occupancy is appropriate in case
-the atom is at a special position.}
+\item{sdata}{A named list, normally obtained through the use of
+functions \code{\link{read_x}} or \code{\link{standardise_sdata}}. 
+The list names correspond to different object types:
+\itemize{
+  \item{a.     Real numeric. The size of the unit cell.}
+  \item{SG.    Character string. Space group symbol; either "P1" 
+               or "P-1"}
+  \item{x0.    Vector of real numerics indicating the expanded atomic
+               positions in the unit cell.}
+  \item{Z.     Vector of integers indicating the expanded 
+               atomic numbers for all atoms in the unit cell.}
+  \item{B.    Vector of real numerics indicating the expanded 
+              B factors for all atoms in the unit cell.}
+  \item{occ.  Vector of real numerics indicating the expanded 
+              occupancies for all atoms in the unit cell.}
+}}
 
 \item{anoflag}{Logical variable. If TRUE it forces scattering factors
 to include anomalous contributions. As a consequence, Friedel's
@@ -64,24 +65,26 @@ symmetry will have to be expanded first with function "expand_to_cell".
 \examples{
 # First create the crystal structure (P1)
 a <- 10
-vx0 <- c(1,4,6.5)
-vZ <- c(8,26,6)
-vB <- c(18,20,17)
-vocc <- c(1,1,1)
+SG <- "P1"
+x0 <- c(1,4,6.5)
+Z <- c(8,26,6)
+B <- c(18,20,17)
+occ <- c(1,1,1)
+sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
 lbda <- 1.7   # Close to Fe's absorption
 
 # Miller indices (including DC (h=0) component)
 hidx <- 0:10
 
 # Now structure factors without anomalous contribution
-F <- strufac(hidx,a,vx0,vZ,vB,vocc,lbda=lbda)
+F <- strufac(hidx,sdata,lbda=lbda)
 print(length(F))  # Includes DC component (h=0)
 print(F[1])       # DC component is real
 print(Mod(F))     # Amplitudes decrease with increasing
                   # resolution (Miller indices)
                   
 # Now try with anomalous contributions
-F <- strufac(hidx,a,vx0,vZ,vB,vocc,lbda=lbda,anoflag=TRUE)
+F <- strufac(hidx,sdata,lbda=lbda,anoflag=TRUE)
 print(F[0])  # DC component is not any longer real
 
 }

@@ -4,40 +4,45 @@
 \alias{expand_to_cell}
 \title{Expand content of asymmetric unit to whole unit cell}
 \usage{
-expand_to_cell(a, vx0, vZ, vB, vocc, SG = "P1")
+expand_to_cell(sdata, SG = NULL)
 }
 \arguments{
-\item{a}{Real numeric. Unit cell length in angstroms.}
-
-\item{vx0}{Vector of real numerics. Atom positions in the asymmetric
-unit.}
-
-\item{vZ}{Vector of integers. Atomic numbers of all atoms in the
-asymmetric unit.}
-
-\item{vB}{Vector of real numerics. B factors for all atoms in the
-asymmetric unit.}
-
-\item{vocc}{Vector of real numerics. Occupancies (value between 0
-and 1) for all atoms in the asymmetric unit. In this function there
-is no mechanism to check whether the occupancy is appropriate in case
-the atom is at a special position.}
+\item{sdata}{A named list, normally obtained through the use of
+function \code{\link{read_x}}. The list names correspond to 
+different object types:
+\itemize{
+  \item{a.     Real numeric. The size of the unit cell.}
+  \item{SG.    Character string. Space group symbol; either "P1" 
+               or "P-1"}
+  \item{x0.    Vector of real numerics indicating the expanded atomic
+               positions in the unit cell.}
+  \item{Z.     Vector of integers indicating the expanded 
+               atomic numbers for all atoms in the unit cell.}
+  \item{B.    Vector of real numerics indicating the expanded 
+              B factors for all atoms in the unit cell.}
+  \item{occ.  Vector of real numerics indicating the expanded 
+              occupancies for all atoms in the unit cell.}
+}}
 
 \item{SG}{2-letters character string. There are only two symmetries
 possible when working within 1D crystallography, P1 (no symmetry)
 and P-1 (inversion through the origin). SG can be either "P1" or
-"P-1" for this function.}
+"P-1" for this function. Default is NULL, in which case the space
+group is assumed to be equal to the one of the input structure.}
 }
 \value{
 A named list with the following elements:
  \itemize{
-   \item{vx0. Vector of real numerics indicating the expanded atomic
+   \item{a.   Real numeric. The size of the unit cell.}
+   \item{SG.  Character string. Name of the space group, either "P1"
+              or "P-1".}
+   \item{x0. Vector of real numerics indicating the expanded atomic
                positions in the unit cell.}
-   \item{vZ.  Vector of integers indicating the expanded atomic numbers
+   \item{Z.  Vector of integers indicating the expanded atomic numbers
                for all atoms in the unit cell.}
-   \item{vB.  Vector of real numerics indicating the expanded B factors
+   \item{B.  Vector of real numerics indicating the expanded B factors
                for all atoms in the unit cell.}
-   \item{vocc. Vector of real numerics indicating the expanded occupancies
+   \item{occ. Vector of real numerics indicating the expanded occupancies
                  for all atoms in the unit cell.}
  }
 }
@@ -50,15 +55,17 @@ barely checked for values outside [0,1] range. Extra-care needed.
 \examples{
 # Asymmetric unit includes 3 atoms between 0 and a/2
 a <- 10
-vx0 <- c(1,2,4)
-vZ <- c(6,8,6)
-vB <- c(1,1.2,1.1)
-vocc <- c(1,1,0.8)
-ltmp <- expand_to_cell(a,vx0,vZ,vB,vocc,"P-1")
+SG <- "P-1"
+x0 <- c(1,2,4)
+Z <- c(6,8,6)
+B <- c(1,1.2,1.1)
+occ <- c(1,1,0.8)
+sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
+ltmp <- expand_to_cell(sdata)
 print(ltmp)  # Positions, atomic numbers, etc. have doubled
 
-# Nothing changes if SG is "P1"
-ltmp <- expand_to_cell(a,vx0,vZ,vB,vocc,"P1")
+# Nothing changes if imposed SG is "P1" (but you get a warning!)
+ltmp <- expand_to_cell(sdata,SG="P1")
 print(ltmp)
 }
 

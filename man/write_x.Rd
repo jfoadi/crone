@@ -4,35 +4,33 @@
 \alias{write_x}
 \title{Write atomic coordinates to a file.}
 \usage{
-write_x(filename, vx0, vZ, vB, vocc, a, SG)
+write_x(filename, sdata)
 }
 \arguments{
 \item{filename}{A character string. Prefix of the output ASCII file to
 include all structural information. The file name will be "[Prefix]_x.dat".}
 
-\item{vx0}{Vector of real numerics. Atom positions in the asymmetric unit.}
-
-\item{vZ}{A vector of atom Z numbers.}
-
-\item{vB}{Vector of real numerics. B factors for all atoms in the
-asymmetric unit.}
-
-\item{vocc}{Vector of real numerics. Occupancies (value between 0
-and 1) for all atoms in the asymmetric unit. In this function there
-is no mechanism to check whether the occupancy is appropriate in case
-the atom is at a special position.}
-
-\item{a}{Real numeric. Unit cell length in angstroms.}
-
-\item{SG}{2-letters character string. There are only two symmetries
-possible when working within 1D crystallography, P1 (no symmetry)
-and P-1 (inversion through the origin). SG can be either "P1" or
-"P-1" for this function.}
+\item{sdata}{A named list, normally obtained through the use of
+function \code{\link{read_x}}. The list names correspond to 
+different object types:
+\itemize{
+  \item{a.     Real numeric. The size of the unit cell.}
+  \item{SG.    Character string. Space group symbol; either "P1" 
+               or "P-1"}
+  \item{x0.    Vector of real numerics indicating the expanded atomic
+               positions in the unit cell.}
+  \item{Z.     Vector of integers indicating the expanded 
+               atomic numbers for all atoms in the unit cell.}
+  \item{B.    Vector of real numerics indicating the expanded 
+              B factors for all atoms in the unit cell.}
+  \item{occ.  Vector of real numerics indicating the expanded 
+              occupancies for all atoms in the unit cell.}
+}}
 }
 \value{
-This function does not return anything, but will create an ASCII file
-   of name *_x.dat which contains all coordinates of the atoms in the structure
-   and other type of information.
+This function does not return anything, but will create an ASCII 
+ file of name *_x.dat which contains all coordinates of the atoms in the 
+ structure and other type of information.
 }
 \description{
 Function to export all information concerning a given structure to a
@@ -40,14 +38,15 @@ so-called coordinates file of type *_x.dat.
 }
 \examples{
 # Create an arbitrary structure in P1
+a <- 23
 SG <- "P1"
-a <- 20
-vx0 <- c(2,11,16,19)
-vZ <- c(6,6,16,8)
-vB <- c(13,14,5,10)
-vocc <- c(1,1,1,1)
+x0 <- c(2,11,16,19)
+Z <- c(6,6,16,8)
+B <- c(13,14,5,10)
+occ <- c(1,1,1,1)
 prfx <- "test"
-write_x(prfx,vx0,vZ,vB,vocc,a,SG)
+sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
+write_x(prfx,sdata)
 
 }
 

@@ -4,24 +4,28 @@
 \alias{structure_gauss}
 \title{Structure of gaussian atoms}
 \usage{
-structure_gauss(x, a, vx0, vZ, vB, vocc, k = ksigma)
+structure_gauss(adata, x = NULL, k = ksigma)
 }
 \arguments{
-\item{x}{Point in the 1D cell at which this function is calculated.}
+\item{adata}{A named list, normally obtained through the use of
+function \code{\link{read_x}}. The list names correspond to 
+different object types:
+\itemize{
+  \item{a.     Real numeric. The size of the unit cell.}
+  \item{SG.    Character string. Space group symbol; either "P1" 
+               or "P-1"}
+  \item{x0.    Vector of real numerics indicating the expanded atomic
+               positions in the unit cell.}
+  \item{Z.     Vector of integers indicating the expanded 
+               atomic numbers for all atoms in the unit cell.}
+  \item{B.    Vector of real numerics indicating the expanded 
+              B factors for all atoms in the unit cell.}
+  \item{occ.  Vector of real numerics indicating the expanded 
+              occupancies for all atoms in the unit cell.}
+}}
 
-\item{a}{A real number. The width of the unit cell in which the gaussian
-atom is placed.}
-
-\item{vx0}{Vector of real numerics. Atom positions in the unit cell.}
-
-\item{vZ}{Vector of integers. Atomic numbers of all atoms in the
-unit cell.}
-
-\item{vB}{Vector of real numerics. B factors for all atoms in the
-unit cell.}
-
-\item{vocc}{Vector of real numerics. Occupancies (value between 0
-and 1) for all atoms in the unit cell.}
+\item{x}{Point in the 1D cell at which this function is calculated.
+Default is NULL, in which case a grid is set up internally.}
 
 \item{k}{A real number. It controls the standard deviation of the 
 gaussian function describing the atom and, thus, the shape of the
@@ -29,8 +33,9 @@ associated peak. The standard deviation sigma is given by:
          \code{sigma = k * sqrt(Z)}}
 }
 \value{
-A vector of length equal to the length of vector x, with
-values equal to the evaluated gaussian atom.
+A named list of length 2: x is the grid (either input by
+ user or set up internally), rr is a vector of length equal to the 
+ length of vector x, with values equal to the evaluated gaussian atoms.
 }
 \description{
 Structure formed by all gaussian atoms in the unit cell. Positions, atomic
@@ -41,29 +46,35 @@ atom forming the structure is also characterised by a given occupancy (between
 \examples{
 # Cell, atom types, positions and B factors
 a <- 10
-vx0 <- c(2,5,7)
-vZ <- c(6,16,8)
-vB <- c(0,0,0)
+SG <- "P1"
+x0 <- c(2,5,7)
+Z <- c(6,16,8)
+B <- c(0,0,0)
 
 # All occupancies to 1
-vocc <- c(1,1,1)
+occ <- c(1,1,1)
+
+# Standard data format
+adata <- standardise_sdata(a,SG,x0,Z,B,occ)
 
 # Grid for unit cell
 x <- seq(0,a,length=1000)
 
 # Structure density
-rho <- structure_gauss(x,a,vx0,vZ,vB,vocc)
-plot(x,rho,type="l",xlab="x",ylab=expression(rho))
+rtmp <- structure_gauss(adata,x)
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
 
-# Now reduce occupancy of sulphure
-vocc[2] <- 0.5
-rho <- structure_gauss(x,a,vx0,vZ,vB,vocc)
-points(x,rho,type="l",col=2)
+# Now reduce occupancy of sulphur
+occ[2] <- 0.5
+adata <- standardise_sdata(a,SG,x0,Z,B,occ)
+rtmp <- structure_gauss(adata,x)
+points(rtmp$x,rtmp$rr,type="l",col=2)
 
 # Increase temperature of oxygen
-vB[3] <- 10
-rho <- structure_gauss(x,a,vx0,vZ,vB,vocc)
-points(x,rho,type="l",col=3)
+B[3] <- 10
+adata <- standardise_sdata(a,SG,x0,Z,B,occ)
+rtmp <- structure_gauss(adata,x)
+points(rtmp$x,rtmp$rr,type="l",col=3)
 
 }
 
