@@ -4,11 +4,11 @@
 \alias{strufac}
 \title{Calculation of structure factors}
 \usage{
-strufac(h, sdata, anoflag = FALSE, aK = anoK, lbda = 1, k = ksigma,
+strufac(hidx, sdata, anoflag = FALSE, aK = anoK, lbda = 1, k = ksigma,
   f1f2out = TRUE)
 }
 \arguments{
-\item{h}{Real numeric. One or more 1D Miller indices.}
+\item{hidx}{Real numeric. One or more 1D Miller indices.}
 
 \item{sdata}{A named list, normally obtained through the use of
 functions \code{\link{read_x}} or \code{\link{standardise_sdata}}. 
@@ -52,15 +52,17 @@ table of f' and f'' values for all chemical elements in the structure.
 Default is for the table to be printed.}
 }
 \value{
-A vector of complex numbers, the structure factors corresponding
-   to the Miller indices in input.
+A named list with two vectors of real numbers, the structure 
+ factors amplitudes, Fmod, and phases, Fpha, corresponding to the Miller 
+ indices in input.
 }
 \description{
-Calculates structure factors corresponding to one or more 1D Miller indices,
-given the atomic content of one unit cell. Anomalous scattering can be
-included using logical flag "anoflag" (default is FALSE). Crystal structures
-are always considered with no symetry. Thus a 1D structure with the P-1
-symmetry will have to be expanded first with function "expand_to_cell".
+Calculates structure factors corresponding to one or more 1D Miller 
+indices, given the atomic content of one unit cell. Anomalous scattering 
+can be included using logical flag "anoflag" (default is FALSE). Crystal 
+structures are always considered with no symetry. Thus a 1D structure 
+with the P-1 symmetry will have to be expanded first with function 
+"expand_to_cell".
 }
 \examples{
 # First create the crystal structure (P1)
@@ -77,15 +79,14 @@ lbda <- 1.7   # Close to Fe's absorption
 hidx <- 0:10
 
 # Now structure factors without anomalous contribution
-F <- strufac(hidx,sdata,lbda=lbda)
-print(length(F))  # Includes DC component (h=0)
-print(F[1])       # DC component is real
-print(Mod(F))     # Amplitudes decrease with increasing
-                  # resolution (Miller indices)
+ftmp <- strufac(hidx,sdata,lbda=lbda)
+print(length(ftmp$Fmod))  # Includes DC component (h=0)
+print(ftmp)          # Amplitudes decrease with increasing
+                     # resolution (Miller indices)
                   
 # Now try with anomalous contributions
-F <- strufac(hidx,sdata,lbda=lbda,anoflag=TRUE)
-print(F[0])  # DC component is not any longer real
+ftmp <- strufac(hidx,sdata,lbda=lbda,anoflag=TRUE)
+print(ftmp)  # DC component is not any longer real
 
 }
 

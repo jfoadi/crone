@@ -91,36 +91,31 @@ sdata <- load_structure("thiocyanate")
 hidx <- 1:10
 
 # Correct amplitudes and phases
-F <- strufac(hidx,sdata)
-Ftrue <- Mod(F)
-phitrue <- Arg(F)
+ftmp <- strufac(hidx,sdata)
+Ftrue <- ftmp$Fmod
+phitrue <- ftmp$Fpha
 
 # Only poissonian errors
 ltmp <- sfobs(hidx,sdata,ntrialP=2)
 print(names(ltmp))
-F <- ltmp$F
-Fpois <- Mod(F)
+Fpois <- ltmp$F
 
 # True density
-rtmptrue <- fousynth(sdata$a,complex(length.out=length(hidx),
- modulus=Ftrue,argument=phitrue),hidx,1000)
+rtmptrue <- fousynth(sdata$a,Fmod=Ftrue,Fpha=phitrue,hidx,1000)
 plot(rtmptrue$x,rtmptrue$rr,type="l",xlab="x",ylab=expression(rho),
  lwd=3)
 
 # Density with poissonian errors
-rtmppois <- fousynth(sdata$a,complex(length.out=length(hidx),
- modulus=Fpois,argument=phitrue),hidx,1000)
+rtmppois <- fousynth(sdata$a,Fmod=Fpois,Fpha=phitrue,hidx,1000)
 points(rtmppois$x,rtmppois$rr,type="l",
  lty=2,col=2,lwd=2) # Very small differences
 
 # Only random atomic errors with standard deviation 0.3 angstroms
 ltmp <- sfobs(hidx,sdata,ntrialP=0,vx0err=0.3)
-F <- ltmp$F
-Fcoords <- Mod(F)
+Fcoords <- ltmp$F
 
 # Density with gaussian errors on atom coordinates
-rtmpcoords <- fousynth(sdata$a,complex(length.out=length(hidx),
- modulus=Fcoords,argument=phitrue),hidx,1000)
+rtmpcoords <- fousynth(sdata$a,Fmod=Fcoords,Fpha=phitrue,hidx,1000)
 points(rtmpcoords$x,rtmpcoords$rr,type="l",
  lty=3,col=3,lwd=2) # Larger differences
 }

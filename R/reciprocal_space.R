@@ -138,13 +138,14 @@ plot_absorption_curves <- function(chem_el,zoom=NULL)
 
 #' Calculation of structure factors
 #' 
-#' Calculates structure factors corresponding to one or more 1D Miller indices,
-#' given the atomic content of one unit cell. Anomalous scattering can be
-#' included using logical flag "anoflag" (default is FALSE). Crystal structures
-#' are always considered with no symetry. Thus a 1D structure with the P-1
-#' symmetry will have to be expanded first with function "expand_to_cell".
+#' Calculates structure factors corresponding to one or more 1D Miller 
+#' indices, given the atomic content of one unit cell. Anomalous scattering 
+#' can be included using logical flag "anoflag" (default is FALSE). Crystal 
+#' structures are always considered with no symetry. Thus a 1D structure 
+#' with the P-1 symmetry will have to be expanded first with function 
+#' "expand_to_cell".
 #' 
-#' @param h Real numeric. One or more 1D Miller indices.
+#' @param hidx Real numeric. One or more 1D Miller indices.
 #' @param sdata A named list, normally obtained through the use of
 #'  functions \code{\link{read_x}} or \code{\link{standardise_sdata}}. 
 #'  The list names correspond to different object types:
@@ -180,8 +181,9 @@ plot_absorption_curves <- function(chem_el,zoom=NULL)
 #' @param f1f2out Logical variable. This variable controls output of a small
 #'    table of f' and f'' values for all chemical elements in the structure.
 #'    Default is for the table to be printed.
-#' @return A vector of complex numbers, the structure factors corresponding
-#'    to the Miller indices in input.
+#' @return A named list with two vectors of real numbers, the structure 
+#'  factors amplitudes, Fmod, and phases, Fpha, corresponding to the Miller 
+#'  indices in input.
 #' @examples 
 #' # First create the crystal structure (P1)
 #' a <- 10
@@ -197,18 +199,17 @@ plot_absorption_curves <- function(chem_el,zoom=NULL)
 #' hidx <- 0:10
 #' 
 #' # Now structure factors without anomalous contribution
-#' F <- strufac(hidx,sdata,lbda=lbda)
-#' print(length(F))  # Includes DC component (h=0)
-#' print(F[1])       # DC component is real
-#' print(Mod(F))     # Amplitudes decrease with increasing
-#'                   # resolution (Miller indices)
+#' ftmp <- strufac(hidx,sdata,lbda=lbda)
+#' print(length(ftmp$Fmod))  # Includes DC component (h=0)
+#' print(ftmp)          # Amplitudes decrease with increasing
+#'                      # resolution (Miller indices)
 #'                   
 #' # Now try with anomalous contributions
-#' F <- strufac(hidx,sdata,lbda=lbda,anoflag=TRUE)
-#' print(F[0])  # DC component is not any longer real
+#' ftmp <- strufac(hidx,sdata,lbda=lbda,anoflag=TRUE)
+#' print(ftmp)  # DC component is not any longer real
 #' 
 #' @export
-strufac <- function(h,sdata,anoflag=FALSE,
+strufac <- function(hidx,sdata,anoflag=FALSE,
                     aK=anoK,lbda=1.0,k=ksigma,f1f2out=TRUE)
 {
   # Check input object is the right one
@@ -265,12 +266,12 @@ strufac <- function(h,sdata,anoflag=FALSE,
   ph_ano <- 0
   
   # Calculate structure factors
-  FRe <- rep(0,times=length(h))
-  FIm <- rep(0,times=length(h))
+  FRe <- rep(0,times=length(hidx))
+  FIm <- rep(0,times=length(hidx))
   for (j in 1:length(vZ))
   {
     # Scattering factor
-    f <- scafac(h,a,vZ[j],vocc[j],vB[j],k)
+    f <- scafac(hidx,a,vZ[j],vocc[j],vB[j],k)
     
     # Anomalous contribution
     if (anoflag)
@@ -278,11 +279,11 @@ strufac <- function(h,sdata,anoflag=FALSE,
       idx <- match(vZ[j],AnoFrame$Z)
       f1 <- aK*AnoFrame$f1[idx]
       f2 <- aK*AnoFrame$f2[idx]
-      ph_ano <- 0.5*pi+2*pi*h*vx0[j]/a
+      ph_ano <- 0.5*pi+2*pi*hidx*vx0[j]/a
     }
     
     # Complex factors
-    ph_reg <- 2*pi*h*vx0[j]/a
+    ph_reg <- 2*pi*hidx*vx0[j]/a
     regRe <- cos(ph_reg)
     regIm <- sin(ph_reg)
     anoRe <- cos(ph_ano)
@@ -296,23 +297,34 @@ strufac <- function(h,sdata,anoflag=FALSE,
     FRe <- FRe+(F1*regRe+F2*anoRe)
     FIm <- FIm+(F1*regIm+F2*anoIm)
   }
-  F <- complex(real=FRe,imaginary=FIm,length.out=length(h))
   
-  return(F)
+  # Amplitudes and phases
+  F <- complex(real=FRe,imaginary=FIm,length.out=length(hidx))
+  Fmod <- Mod(F)
+  Fpha <- Arg(F)*180/pi
+  idx <- which(abs(Im(F)) < 0.000001 & Re(F) >= 0.000001 & Re(F) > 0)
+  Fpha[idx] <- 0.0
+  idx <- which(abs(Im(F)) < 0.000001 & Re(F) >= 0.000001 & Re(F) < 0)
+  Fpha[idx] <- 180.0
+  
+  return(list(Fmod=Fmod,Fpha=Fpha))
 }
 
 
 #' From structure factors to density using Fourier synthesis
 #' 
-#' Given a set of complex structure factors corresponding to a set of 1D
+#' Given a set of structure factors, separately as a vector of amplitudes 
+#' and a vector of phases in degrees, corresponding to a set of 1D
 #' Miller indices, the length of the 1D unit cell, the set of Miller indices
 #' and the number of grid points used to calculate the 1D density, this
 #' function calculates the 1D density corresponding to the given structure
 #' factors.
 #' 
 #' @param a A real number. The unit cell side length.
-#' @param F A vector of complex numbers. The structure factors corresponding to
-#'    the 1D density to be calculated.
+#' @param Fmod A vector of real numbers. The structure factors' amplitudes
+#'  corresponding to the 1D density to be calculated.
+#' @param Fpha A vector of real numbers. The structure factors' phases
+#'  (in degrees) corresponding to the 1D density to be calculated.
 #' @param hidx A vector of integer numbers. The set of 1D Miller indices
 #'    corresponding to the set of structure factors F.
 #' @param N An integer number. The number of grid points used to calculate the
@@ -333,24 +345,27 @@ strufac <- function(h,sdata,anoflag=FALSE,
 #' hidx <- 0:20
 #' 
 #' # Compute the structure factors
-#' F <- strufac(hidx,sdata)
+#' ftmp <- strufac(hidx,sdata)
 #' 
 #' # Number of grid points
 #' N <- 1000
 #' 
 #' # Density
-#' rtmp <- fousynth(a,F,hidx,N)
+#' rtmp <- fousynth(a,ftmp$Fmod,ftmp$Fpha,hidx,N)
 #' 
 #' # Density plot in the unit cell
 #' x <- rtmp$x
 #' rho <- rtmp$rr
 #' plot(x,rho,type="l",xlab="x",ylab=expression(rho))
 #' @export
-fousynth <- function(a,F,hidx,N)
+fousynth <- function(a,Fmod,Fpha,hidx,N)
 {
   # Arrays checks
-  if (length(F) != length(hidx))
+  if (length(Fmod) != length(hidx) | length(Fpha) != length(hidx))
     stop("Arrays do not have same length")
+  
+  # Merge amplitudes and phases in complex values
+  F <- complex(modulus=Fmod,argument=Fpha*pi/180,length.out=length(hidx))
   
   # Check numbers are compatible
   hmax <- max(abs(hidx))
@@ -397,6 +412,82 @@ fousynth <- function(a,F,hidx,N)
   x <- seq(0,a,length=N+1)[1:N]
   
   return(list(x=x,rr=rr,G=G))
+}
+
+
+#' From density to structure factors using inverse Fourier synthesis
+#' 
+#' Given a density as vector calculated in N grid points, the unit cell
+#' size and an array of Miller indices hidx, this function calculates
+#' amplitudes and phases of the structure factors corresponding to this
+#' density, via inverse Fourier transform.
+#' 
+#' @param a A real number. The unit cell side length.
+#' @param rho A vector of N real numbers representing the 1D density at
+#'    each of the regular N grid point.
+#' @param hidx A vector of integer numbers. The set of 1D Miller indices
+#'    corresponding to the set of structure factors F, to be calculated.
+#' @return A vector of N real numbers representing the calculated 1D 
+#'    density at each one of the regular N grid points.
+#' @examples 
+#' # First create the crystal structure (in P1)
+#' a <- 10
+#' SG <- "P1"
+#' x0 <- c(1,4,6.5)
+#' Z <- c(8,26,6)
+#' B <- c(18,20,17)
+#' occ <- c(1,1,1)
+#' sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
+#' 
+#' # 10 Miller indices plus DC component
+#' hidx <- 0:10
+#' 
+#' # Compute structure factors
+#' ftmp1 <- strufac(hidx,sdata)
+#' 
+#' # Number of grid points
+#' N <- 1000
+#' 
+#' # Density
+#' rtmp <- fousynth(a,ftmp1$Fmod,ftmp1$Fpha,hidx,N)
+#' 
+#' # Using inverse Fourier to obtain structure factors
+#' ftmp2 <- invfousynth(a,rtmp$rr,hidx)
+#' 
+#' # Comparison
+#' print(abs(ftmp1$Fmod-ftmp2$Fmod))
+#' print(abs(ftmp1$Fpha-ftmp2$Fpha))
+#' 
+#' @export
+invfousynth <- function(a,rho,hidx)
+{
+  # Grid length
+  N <- length(rho)
+  
+  # Check numbers are compatible
+  hmax <- max(abs(hidx))
+  if (hmax >= 0.5*N) stop("Grid too coarse. Increase max Miller index.")
+  
+  # Inverse Fourier transform
+  G <- a*fft(rho,inverse=TRUE)/N
+  
+  # Temporary structure factors holder
+  tmpF <- G[1:(hmax+1)]
+  
+  # Final structure factors
+  fullidx <- 0:hmax
+  idx <- match(hidx,fullidx)
+  F <- G[idx]
+  
+  # Amplitudes and phases
+  Fmod <- Mod(F)
+  Fpha <- Arg(F)*180/pi
+  idx <- which(abs(Im(F)) < 0.000001 & Re(F) >= 0.000001 & Re(F) > 0)
+  Fpha[idx] <- 0.0
+  idx <- which(abs(Im(F)) < 0.000001 & Re(F) >= 0.000001 & Re(F) < 0)
+  Fpha[idx] <- 180.0
+  
+  return(list(Fmod=Fmod,Fpha=Fpha))
 }
 
 
@@ -535,36 +626,31 @@ fluorescent_scan <- function(chem_el,lambda_range=NULL)
 #' hidx <- 1:10
 #' 
 #' # Correct amplitudes and phases
-#' F <- strufac(hidx,sdata)
-#' Ftrue <- Mod(F)
-#' phitrue <- Arg(F)
+#' ftmp <- strufac(hidx,sdata)
+#' Ftrue <- ftmp$Fmod
+#' phitrue <- ftmp$Fpha
 #' 
 #' # Only poissonian errors
 #' ltmp <- sfobs(hidx,sdata,ntrialP=2)
 #' print(names(ltmp))
-#' F <- ltmp$F
-#' Fpois <- Mod(F)
+#' Fpois <- ltmp$F
 #' 
 #' # True density
-#' rtmptrue <- fousynth(sdata$a,complex(length.out=length(hidx),
-#'  modulus=Ftrue,argument=phitrue),hidx,1000)
+#' rtmptrue <- fousynth(sdata$a,Fmod=Ftrue,Fpha=phitrue,hidx,1000)
 #' plot(rtmptrue$x,rtmptrue$rr,type="l",xlab="x",ylab=expression(rho),
 #'  lwd=3)
 #' 
 #' # Density with poissonian errors
-#' rtmppois <- fousynth(sdata$a,complex(length.out=length(hidx),
-#'  modulus=Fpois,argument=phitrue),hidx,1000)
+#' rtmppois <- fousynth(sdata$a,Fmod=Fpois,Fpha=phitrue,hidx,1000)
 #' points(rtmppois$x,rtmppois$rr,type="l",
 #'  lty=2,col=2,lwd=2) # Very small differences
 #' 
 #' # Only random atomic errors with standard deviation 0.3 angstroms
 #' ltmp <- sfobs(hidx,sdata,ntrialP=0,vx0err=0.3)
-#' F <- ltmp$F
-#' Fcoords <- Mod(F)
+#' Fcoords <- ltmp$F
 #' 
 #' # Density with gaussian errors on atom coordinates
-#' rtmpcoords <- fousynth(sdata$a,complex(length.out=length(hidx),
-#'  modulus=Fcoords,argument=phitrue),hidx,1000)
+#' rtmpcoords <- fousynth(sdata$a,Fmod=Fcoords,Fpha=phitrue,hidx,1000)
 #' points(rtmpcoords$x,rtmpcoords$rr,type="l",
 #'  lty=3,col=3,lwd=2) # Larger differences
 #' @export
@@ -591,9 +677,9 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
   # Data Ok. Carry on.
   
   # Initial sf and errors
-  tmp <- strufac(hidx,sdata,anoflag,aK,lbda,k,f1f2out)
-  Fobs <- Mod(tmp)
-  rm(tmp)
+  ftmp <- strufac(hidx,sdata,anoflag,aK,lbda,k,f1f2out)
+  Fobs <- ftmp$Fmod
+  rm(ftmp)
   Ffinal1 <- Fobs
   sFfinal1 <- rep(0,times=length(hidx))
   Ffinal2 <- Fobs
@@ -636,8 +722,8 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
       if (!is.null(vx0err)) nx0 <- sdata$x0+rnorm(n=length(sdata$x0),
                                                   sd=vx0err)
       tmpadata$x0 <- nx0
-      tmp <- strufac(hidx,tmpadata,anoflag,aK,lbda,k,f1f2out)
-      Fmatrix[itrial,] <- Mod(tmp)
+      ftmp <- strufac(hidx,tmpadata,anoflag,aK,lbda,k,f1f2out)
+      Fmatrix[itrial,] <- ftmp$Fmod
     }
     Ffinal2 <- apply(Fmatrix,2,mean,na.rm=TRUE)
     sFfinal2 <- apply(Fmatrix,2,sd,na.rm=TRUE)

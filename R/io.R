@@ -588,8 +588,8 @@ standardise_fdata <- function(a,SG,hidx,
 #' sigFobs <- ltmp$sF
 #' 
 #' # Phases from calculated structure factors
-#' F <- strufac(hidx,sdata)
-#' phicalc <- Arg(F)*180/pi
+#' ftmp <- strufac(hidx,sdata)
+#' phicalc <- ftmp$Fpha
 #' 
 #' # Create standardised fdata structure
 #' fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,Fobs=Fobs,

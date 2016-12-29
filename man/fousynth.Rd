@@ -4,13 +4,16 @@
 \alias{fousynth}
 \title{From structure factors to density using Fourier synthesis}
 \usage{
-fousynth(a, F, hidx, N)
+fousynth(a, Fmod, Fpha, hidx, N)
 }
 \arguments{
 \item{a}{A real number. The unit cell side length.}
 
-\item{F}{A vector of complex numbers. The structure factors corresponding to
-the 1D density to be calculated.}
+\item{Fmod}{A vector of real numbers. The structure factors' amplitudes
+corresponding to the 1D density to be calculated.}
+
+\item{Fpha}{A vector of real numbers. The structure factors' phases
+(in degrees) corresponding to the 1D density to be calculated.}
 
 \item{hidx}{A vector of integer numbers. The set of 1D Miller indices
 corresponding to the set of structure factors F.}
@@ -23,7 +26,8 @@ A vector of N real numbers representing the calculated 1D density at
    each of the regular N grid points.
 }
 \description{
-Given a set of complex structure factors corresponding to a set of 1D
+Given a set of structure factors, separately as a vector of amplitudes 
+and a vector of phases in degrees, corresponding to a set of 1D
 Miller indices, the length of the 1D unit cell, the set of Miller indices
 and the number of grid points used to calculate the 1D density, this
 function calculates the 1D density corresponding to the given structure
@@ -43,13 +47,13 @@ sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
 hidx <- 0:20
 
 # Compute the structure factors
-F <- strufac(hidx,sdata)
+ftmp <- strufac(hidx,sdata)
 
 # Number of grid points
 N <- 1000
 
 # Density
-rtmp <- fousynth(a,F,hidx,N)
+rtmp <- fousynth(a,ftmp$Fmod,ftmp$Fpha,hidx,N)
 
 # Density plot in the unit cell
 x <- rtmp$x
