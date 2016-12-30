@@ -4,12 +4,12 @@
 \alias{structure_gauss}
 \title{Structure of gaussian atoms}
 \usage{
-structure_gauss(adata, x = NULL, k = ksigma)
+structure_gauss(sdata, x = NULL, N = NULL, k = ksigma)
 }
 \arguments{
-\item{adata}{A named list, normally obtained through the use of
-function \code{\link{read_x}}. The list names correspond to 
-different object types:
+\item{sdata}{A named list, normally obtained through the use of
+function \code{\link{read_x}} or \code{\link{standardise_sdata}}. 
+The list names correspond to  different object types:
 \itemize{
   \item{a.     Real numeric. The size of the unit cell.}
   \item{SG.    Character string. Space group symbol; either "P1" 
@@ -27,6 +27,9 @@ different object types:
 \item{x}{Point in the 1D cell at which this function is calculated.
 Default is NULL, in which case a grid is set up internally.}
 
+\item{N}{Integer. Number of points in the regular grid, if the grid
+is not provided directly.}
+
 \item{k}{A real number. It controls the standard deviation of the 
 gaussian function describing the atom and, thus, the shape of the
 associated peak. The standard deviation sigma is given by:
@@ -38,10 +41,10 @@ A named list of length 2: x is the grid (either input by
  length of vector x, with values equal to the evaluated gaussian atoms.
 }
 \description{
-Structure formed by all gaussian atoms in the unit cell. Positions, atomic
-numbers and thermal factors are given by vectors of a same length. Each
-atom forming the structure is also characterised by a given occupancy (between
-0 and 1).
+Structure formed by all gaussian atoms in the unit cell. Positions, 
+atomic numbers and thermal factors are given by vectors of a same 
+length. Each atom forming the structure is also characterised by a given 
+occupancy (between 0 and 1).
 }
 \examples{
 # Cell, atom types, positions and B factors
@@ -55,25 +58,25 @@ B <- c(0,0,0)
 occ <- c(1,1,1)
 
 # Standard data format
-adata <- standardise_sdata(a,SG,x0,Z,B,occ)
+sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
 
 # Grid for unit cell
 x <- seq(0,a,length=1000)
 
 # Structure density
-rtmp <- structure_gauss(adata,x)
+rtmp <- structure_gauss(sdata,x)
 plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
 
 # Now reduce occupancy of sulphur
 occ[2] <- 0.5
-adata <- standardise_sdata(a,SG,x0,Z,B,occ)
-rtmp <- structure_gauss(adata,x)
+sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
+rtmp <- structure_gauss(sdata,x)
 points(rtmp$x,rtmp$rr,type="l",col=2)
 
 # Increase temperature of oxygen
 B[3] <- 10
-adata <- standardise_sdata(a,SG,x0,Z,B,occ)
-rtmp <- structure_gauss(adata,x)
+sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
+rtmp <- structure_gauss(sdata,x)
 points(rtmp$x,rtmp$rr,type="l",col=3)
 
 }

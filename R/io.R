@@ -523,6 +523,96 @@ standardise_fdata <- function(a,SG,hidx,
   return(fdata)
 }
 
+
+#' Load observed structure factors from 1D structure data in workspace.
+#' 
+#' Function to load structure factors corresponding to one of the many 1D 
+#' structures available within the \emph{crone} package. The structure
+#' factors amplitudes have been generated from calculated data with some
+#' simulated error, so that they mimick observed data. Phases are calculated
+#' from the correct structure.
+#' 
+#' @param sname A character string. Name of the structure whose data
+#'  are to be loaded in the workspace. It can be one of:
+#'  \itemize{
+#'    \item{beryllium_fluoride}
+#'    \item{carbon_dioxide}
+#'    \item{cyanate}
+#'    \item{nitronium}
+#'    \item{thiocyanate}
+#'    \item{xenon_difluoride}
+#'  }
+#'  Default is NULL, in which case the function returns a list of all
+#'  structures available.
+#' @return A named fdata-type list with the following elements:
+#'  \itemize{
+#'    \item{a    Real numeric. Unit cell length in angstroms. Always 
+#'               included.}
+#'    \item{SG.   Spacegroup 2-letters character string. There are only two 
+#'                symmetries possible when working within 1D 
+#'                crystallography, P1 (no symmetry) and P-1 (inversion 
+#'                through the origin). SG can be either "P1" or "P-1". 
+#'                Always included.}
+#'    \item{hidx. Real numeric array. 1D unique (positive in the 1D context) 
+#'                Miller indices. Always included.}
+#'    \item{Fobs.      Real numeric array. Amplitudes of observed structure 
+#'                     factors. Not always included.}
+#'    \item{sigFobs.   Real numeric array. Errors associated with Fobs. Not 
+#'                     always included.}
+#'    \item{Phicalc.   Real numeric array. Phases (in degrees) of structure 
+#'                     factors calculated from the correct 1D structure. 
+#'                     They are normally used to check correctness of 
+#'                     Phiobs. Not always included.}
+#'          }  
+#' @examples 
+#' # Load thiocyanate data
+#' fdata <- load_data("thiocyanate")
+#' print(fdata)
+#' 
+#' # Default returns all names of structures included
+#' load_data()
+#' 
+#' @export
+load_data <- function(sname=NULL)
+{
+  # All names
+  all_names <- c("beryllium_fluoride",
+                 "carbon_dioxide","cyanate",
+                 "nitronium","thiocyanate",
+                 "xenon_difluoride")
+  
+  # Load data if they exist
+  if (!is.null(sname))
+  {
+    ans <- (sname %in% all_names)
+    
+    if (!ans)
+    {
+      warning("No structure with this name is included in the 
+              CRONE package.")
+    }
+    if (ans)
+    {
+      stmp <- paste(sname,"_h.dat",sep="")
+      datadir <- system.file("extdata",package="crone")
+      filename <- file.path(datadir,stmp)
+      fdata <- read_h(filename)
+    }
+    
+    return(fdata)
+    }
+  # If no input return all names
+  if (is.null(sname))
+  {
+    cat("1D structures available for loading:\n\n")
+    for (stmp in all_names)
+    {
+      cat(paste("   ",stmp,"\n",sep=""))
+    }
+  }
+}
+
+
 #' Write structure factors to a reflections file
 #' 
 #' This function writes standardised structure factors data into an ASCII
