@@ -69,6 +69,7 @@ local_maxima <- function(x)
 #' @param x  A vector of real numbers.
 #' @param x0 A real number. The x value at which the function step occurs.
 #' @return One of the two numbers 0 or 1.
+#' @import graphics
 #' @examples 
 #' x <- seq(-3,5,length=1000)
 #' x0 <- 1
@@ -103,6 +104,9 @@ heaviside <- function(x,x0=0)
 #' x <- seq(-1,1,length=1000)
 #' y <- erf(x)
 #' plot(x,y,type="l")
+#' 
+#' @import stats
+#' 
 #' @export
 erf <- function(x)
 {

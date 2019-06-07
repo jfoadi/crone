@@ -21,4 +21,5 @@ Error function for real values
 x <- seq(-1,1,length=1000)
 y <- erf(x)
 plot(x,y,type="l")
+
 }

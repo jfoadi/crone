@@ -915,6 +915,8 @@ write_h <- function(filename,fdata)
 #' print(fdata$Fobs)
 #' print(fdata$sigFobs)
 #' 
+#' @import utils
+#' 
 #' @export
 read_h <- function(filename)
 {

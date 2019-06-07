@@ -3,9 +3,7 @@ Type: Package
 Title: Structural crystallography in 1D
 Version: 0.1.0
 Date: 2016-08-16
-Authors@R: c(
-	person("James","Foadi",email="james.foadi@diamond.ac.uk",role=c("cre","aut")),
-	person("Emily","Smith",email="es617@cam.ac.uk",role="aut"))
+Authors@R: person("James","Foadi",email="james.foadi@diamond.ac.uk",role=c("cre","aut"))
 Description: crone contains functions and data to carry out all major structural
     crystallography calculations in one dimension.
 License: GPL-2
@@ -14,3 +12,5 @@ LazyData: true
 RoxygenNote: 6.1.1
 Suggests: knitr
 VignetteBuilder: knitr
+Encoding: UTF-8
+Depends: R (>= 3.5.0)
