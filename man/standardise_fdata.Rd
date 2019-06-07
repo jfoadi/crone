@@ -4,9 +4,9 @@
 \alias{standardise_fdata}
 \title{Standardise reflections data}
 \usage{
-standardise_fdata(a, SG, hidx, Fobs = NULL, sigFobs = NULL, Fp = NULL,
-  sigFp = NULL, Fm = NULL, sigFm = NULL, Phiobs = NULL,
-  Phicalc = NULL)
+standardise_fdata(a, SG, hidx, Fobs = NULL, sigFobs = NULL,
+  Fp = NULL, sigFp = NULL, Fm = NULL, sigFm = NULL,
+  Phiobs = NULL, Phicalc = NULL)
 }
 \arguments{
 \item{a}{Real numeric. Unit cell length in angstroms.}
@@ -149,4 +149,3 @@ fdata <- standardise_fdata(a,SG,hidx,Fobs=Fobs,sigFobs=sigFobs)
 print(fdata)
 
 }
-

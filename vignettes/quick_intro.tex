@@ -1,0 +1,133 @@
+\documentclass[12pt,a4paper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage{amsfonts}
+\usepackage{hyperref}
+
+\author{James Foadi \\ 
+        email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
+
+\title{A quick introduction to crone}
+
+%\VignetteIndexEntry{A quick introduction to crone}
+%\VignetteEngine{knitr::knitr}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\maketitle
+
+The \texttt{crone} package has been developed to allow students in quantitative subjects coming to terms with the common operations and algorithms used in x-ray structural crystallography. This discipline deals with the determination of atomic positions and average thermal vibrations for molecules arranged in highly-ordered 3D crystalline lattices. To avoid the (mostly notational) complications of 3D mathematics and in order to allow a clearer and transparent handling of the main mathematical concepts and calculations, \texttt{crone} defines atoms, molecules and crystal structures in 1D, rather than 3D. While there are 230 types of crystal symmetry (groups) in 3D, there are only two symmetries in 1D, called $P1$ and $P\bar{1}$. A few $P1$ and $P\bar{1}$ structures are included in the package to provide data for various demonstrations. Arbitrary 1D structures can also be defined by the user at any time.
+
+In this quick introduction two different 1D structures will be loaded from the \texttt{crone} library into the working space. Graphical representations and some crystallographic calculations will follow, with the aim of demonstrating some of the package's possible uses
+
+\section{Data preparation}
+A certain number of so-called \emph{linear molecules} are included in the package. To load data corresponding to these molecules you have to use function \texttt{load\_structure}. If the function is called without argument (default is \texttt{NULL}), then the list of all 1D structures available is returned:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{require}\hlstd{(crone)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: crone}}\begin{alltt}
+\hlkwd{load_structure}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 1D structures available for loading:
+## 
+##    beryllium_fluoride
+##    carbon_dioxide
+##    cyanate
+##    nitronium
+##    thiocyanate
+##    xenon_difluoride
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Let's try and load data corresponding to carbon dioxide:
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Make sure to type the underscore!}
+\hlstd{sdata} \hlkwb{<-} \hlkwd{load_structure}\hlstd{(}\hlstr{"carbon_dioxide"}\hlstd{)}
+
+\hlcom{# The object returned by load_structure is a named list}
+\hlkwd{class}\hlstd{(sdata)}
+\end{alltt}
+\begin{verbatim}
+## [1] "list"
+\end{verbatim}
+\begin{alltt}
+\hlkwd{names}\hlstd{(sdata)}
+\end{alltt}
+\begin{verbatim}
+## [1] "a"   "SG"  "x0"  "Z"   "B"   "occ"
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\section{Conclusions}
+
+Elliptic functions are an interesting and instructive branch of
+complex analysis, and are frequently encountered in applied
+mathematics: here they were used to calculate a potential flow field
+in a rectangle.
+
+
+
+\subsection*{Acknowledgements}
+I would like to acknowledge the many stimulating and helpful comments
+%\bibliography{elliptic}
+\end{document}

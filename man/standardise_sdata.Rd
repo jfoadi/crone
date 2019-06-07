@@ -62,4 +62,3 @@ sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
 print(sdata)
 
 }
-

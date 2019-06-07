@@ -58,4 +58,3 @@ print(fdata)
 load_data()
 
 }
-

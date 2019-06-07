@@ -17,4 +17,3 @@ This is a dataframe including a 2-characters string indicating the atomic
 element name and an integer indicating the atomic number Z.
 }
 \keyword{datasets}
-

@@ -5,7 +5,8 @@
 \title{Generation of structure factors with errors}
 \usage{
 sfobs(hidx, sdata, vx0err = NULL, ntrialP = 100, ntrialG = 100,
-  anoflag = FALSE, aK = anoK, lbda = 1, k = ksigma, f1f2out = TRUE)
+  anoflag = FALSE, aK = anoK, lbda = 1, k = ksigma,
+  f1f2out = TRUE)
 }
 \arguments{
 \item{hidx}{Real numeric. One or more 1D Miller indices.}
@@ -119,4 +120,3 @@ rtmpcoords <- fousynth(sdata$a,Fmod=Fcoords,Fpha=phitrue,hidx,1000)
 points(rtmpcoords$x,rtmpcoords$rr,type="l",
  lty=3,col=3,lwd=2) # Larger differences
 }
-

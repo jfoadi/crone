@@ -27,4 +27,3 @@ kk <- kgauss(sigma,a)
 print(kk)
 
 }
-

@@ -40,4 +40,3 @@ lFe <- fluorescent_scan("Fe",lambda_range=c(6,8))
 print(lFe$lambda)
 
 }
-

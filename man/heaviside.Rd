@@ -33,4 +33,3 @@ y2 <- 1-y2
 plot(x1,y1,type="l",xlim=c(-3,9),xlab="x",ylab="y")
 points(x2,y2,type="l")
 }
-

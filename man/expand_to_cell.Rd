@@ -68,4 +68,3 @@ print(ltmp)  # Positions, atomic numbers, etc. have doubled
 ltmp <- expand_to_cell(sdata,SG="P1")
 print(ltmp)
 }
-

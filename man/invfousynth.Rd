@@ -55,4 +55,3 @@ print(abs(ftmp1$Fmod-ftmp2$Fmod))
 print(abs(ftmp1$Fpha-ftmp2$Fpha))
 
 }
-

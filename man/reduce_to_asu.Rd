@@ -82,4 +82,3 @@ adata <- standardise_sdata(a,SG,x0,Z,B,occ)
 ltmp3 <- reduce_to_asu(adata)
 print(ltmp3) # Now all positions are inside the unit cell
 }
-

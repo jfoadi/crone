@@ -23,4 +23,3 @@ for the specific chemical element.
 ano_Fe <- load_anomalous_data("Fe")
 print(ano_Fe[1:10,])
 }
-

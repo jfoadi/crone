@@ -80,4 +80,3 @@ rtmp <- structure_gauss(sdata,x)
 points(rtmp$x,rtmp$rr,type="l",col=3)
 
 }
-

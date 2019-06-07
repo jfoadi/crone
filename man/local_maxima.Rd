@@ -21,4 +21,3 @@ t <- seq(-10,10,length=1000)
 x <- dnorm(t,mean=3)+dnorm(t,mean=7)
 yM <- local_maxima(x)
 }
-

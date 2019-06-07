@@ -19,4 +19,3 @@ This dataset is a list where each element is an atomic species.
 Each element of the list is a dataframe with 3 columns.
 }
 \keyword{datasets}
-

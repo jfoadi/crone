@@ -11,4 +11,6 @@ Description: crone contains functions and data to carry out all major structural
 License: GPL-2
 LazyLoad: yes
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.1
+Suggests: knitr
+VignetteBuilder: knitr

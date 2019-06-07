@@ -60,4 +60,3 @@ x <- rtmp$x
 rho <- rtmp$rr
 plot(x,rho,type="l",xlab="x",ylab=expression(rho))
 }
-

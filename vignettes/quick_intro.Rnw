@@ -1,0 +1,54 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{amsfonts}
+\usepackage{hyperref}
+
+\author{James Foadi \\ 
+        email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
+
+\title{A quick introduction to crone}
+
+%\VignetteIndexEntry{A quick introduction to crone}
+%\VignetteEngine{knitr::knitr}
+
+
+\begin{document}
+
+\maketitle
+
+The \texttt{crone} package has been developed to allow students in quantitative subjects coming to terms with the common operations and algorithms used in x-ray structural crystallography. This discipline deals with the determination of atomic positions and average thermal vibrations for molecules arranged in highly-ordered 3D crystalline lattices. To avoid the (mostly notational) complications of 3D mathematics and in order to allow a clearer and transparent handling of the main mathematical concepts and calculations, \texttt{crone} defines atoms, molecules and crystal structures in 1D, rather than 3D. While there are 230 types of crystal symmetry (groups) in 3D, there are only two symmetries in 1D, called $P1$ and $P\bar{1}$. A few $P1$ and $P\bar{1}$ structures are included in the package to provide data for various demonstrations. Arbitrary 1D structures can also be defined by the user at any time.
+
+In this quick introduction two different 1D structures will be loaded from the \texttt{crone} library into the working space. Graphical representations and some crystallographic calculations will follow, with the aim of demonstrating some of the package's possible uses
+
+\section{Data preparation}
+A certain number of so-called \emph{linear molecules} are included in the package. To load data corresponding to these molecules you have to use function \texttt{load\_structure}. If the function is called without argument (default is \texttt{NULL}), then the list of all 1D structures available is returned:
+
+<<ch01>>=
+require(crone)
+load_structure()
+@
+
+Let's try and load data corresponding to carbon dioxide:
+
+<<ch02>>=
+# Make sure to type the underscore!
+sdata <- load_structure("carbon_dioxide")
+
+# The object returned by load_structure is a named list
+class(sdata)
+names(sdata)
+@
+
+\section{Conclusions}
+
+Elliptic functions are an interesting and instructive branch of
+complex analysis, and are frequently encountered in applied
+mathematics: here they were used to calculate a potential flow field
+in a rectangle.
+
+
+
+\subsection*{Acknowledgements}
+I would like to acknowledge the many stimulating and helpful comments
+%\bibliography{elliptic}
+\end{document}

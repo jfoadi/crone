@@ -51,4 +51,3 @@ print(sdata)
 load_structure()
 
 }
-

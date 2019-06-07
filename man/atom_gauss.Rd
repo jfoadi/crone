@@ -42,4 +42,3 @@ x <- seq(0,a,length=1000)
 rho <- atom_gauss(x,a,x0,Z)
 plot(x,rho,type="l",xlab="x",ylab=expression(rho))
 }
-

@@ -63,4 +63,3 @@ Bj <- 10
 fval <- scafac(h,a,Zj,occj,Bj)
 points(h,fval,type="l",col=4)
 }
-

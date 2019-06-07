@@ -4,8 +4,8 @@
 \alias{strufac}
 \title{Calculation of structure factors}
 \usage{
-strufac(hidx, sdata, anoflag = FALSE, aK = anoK, lbda = 1, k = ksigma,
-  f1f2out = TRUE)
+strufac(hidx, sdata, anoflag = FALSE, aK = anoK, lbda = 1,
+  k = ksigma, f1f2out = TRUE)
 }
 \arguments{
 \item{hidx}{Real numeric. One or more 1D Miller indices.}
@@ -89,4 +89,3 @@ ftmp <- strufac(hidx,sdata,lbda=lbda,anoflag=TRUE)
 print(ftmp)  # DC component is not any longer real
 
 }
-

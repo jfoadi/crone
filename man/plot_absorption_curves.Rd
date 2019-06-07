@@ -29,4 +29,3 @@ plot_absorption_curves("Fe")
 # Zoom
 plot_absorption_curves("Fe",c(1,3))
 }
-

@@ -63,4 +63,3 @@ print(fdata$Fobs)
 print(fdata$sigFobs)
 
 }
-
