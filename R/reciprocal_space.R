@@ -302,9 +302,9 @@ strufac <- function(hidx,sdata,anoflag=FALSE,
   F <- complex(real=FRe,imaginary=FIm,length.out=length(hidx))
   Fmod <- Mod(F)
   Fpha <- Arg(F)*180/pi
-  idx <- which(abs(Im(F)) < 0.000001 & Re(F) >= 0.000001 & Re(F) > 0)
+  idx <- which(abs(Im(F)) < 0.000001 & abs(Re(F)) >= 0.000001 & Re(F) > 0)
   Fpha[idx] <- 0.0
-  idx <- which(abs(Im(F)) < 0.000001 & Re(F) >= 0.000001 & Re(F) < 0)
+  idx <- which(abs(Im(F)) < 0.000001 & abs(Re(F)) >= 0.000001 & Re(F) < 0)
   Fpha[idx] <- 180.0
   
   return(list(Fmod=Fmod,Fpha=Fpha))

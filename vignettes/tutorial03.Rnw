@@ -17,7 +17,7 @@
 %\VignetteEngine{knitr::knitr}
 
 <<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
-#system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
+system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
 @
 
 \begin{document}
@@ -37,11 +37,12 @@ sdata
 
 \noindent From the data in the list \texttt{sdata} we can create the exact analytic electron density using function \texttt{structure\_gauss}.
 
+\begin{center}
 <<ch02,out.width='3.2in'>>=
 rtmp <- structure_gauss(sdata,N=1000) # Grid with 1000 points
-plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho),
-     ylim=c(-1,max(rtmp$rr)))
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
 @
+\end{center}
 
 \noindent This structure is made of three atoms (three peaks), roughly located between 0 and 1, close to 2 and close to 3. In order to find out the correct location of the peaks, and thus the coordinates of the atoms, we make use of \texttt{local\_maxima}. The maxima and minima in the electron density are returned as integers corresponding to specific cells of the electron density array.
 
@@ -52,13 +53,125 @@ idx
 
 \noindent Such indices can then be used in conjunction with the electron density to find out which integer corresponds to maxima and, accordingly, display the peaks' location.
 
+\begin{center}
 <<ch04,out.width='3.2in'>>=
-plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho),
-     ylim=c(-1,max(rtmp$rr)))
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
 for (i in 1:length(idx)) {
   points(rtmp$x[idx[i]],rtmp$rr[idx[i]],pch=16,cex=1.5,col=2)
 }
+
+# Peak coordinates found and comparison with published values
+for (i in 1:length(idx)) {
+  line <- sprintf("%5.3f  %5.3f\n",rtmp$x[idx[i]],sdata$x0[i])
+  cat(line)
+}
 @
+\end{center}
+
+\noindent Peaks coordinates are not exactly equal to the published-structure coordinates because B factors and gaussians' widths slightly shift them. Fixing B to zero and using smaller values of the atomic number (Z) will improve accuracy, as shown in the following snippet where $Z=1$ and $B=0$ for all atoms.
+
+\begin{center}
+<<ch05,out.width='3.2in'>>=
+# Change all 3 B factors to 0
+sdata$B <- c(0,0,0)
+
+# Change all atoms to hydrogens
+sdata$Z <- c(1,1,1)
+sdata
+
+# Electron density
+rtmp <- structure_gauss(sdata,N=1000) # Grid with 10000 point
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
+
+# Local maxima
+idx <- local_maxima(rtmp$rr)
+idx
+for (i in 1:length(idx)) {
+  line <- sprintf("%5.3f  %5.3f\n",rtmp$x[idx[i]],sdata$x0[i])
+  cat(line)
+}
+@
+\end{center}
+
+\section{Peak search when the density come from a correct Fourier synthesis}
+The interest in finding the coordinates of the electron density peaks' coordinates exists because the atoms' positions are obviously unknown. The electron density is in general computed not as an exact analytic expression made out of gaussians, but as a Fourier synthesis in which the Fourier amplitudes are obtained experimentally and the Fourier phases have to be found with one of the many \emph{phasing methods} existing in structural crystallography. In what follows we will assume that the phases found coincide with the correct phases; in the next section we will explore the effect on the electron density of both errors in the Fourier amplitudes and phases.\\
+\noindent To start, let's reload the cyanate data with the unmodified Z and B values. Then let's compute the pristine structure factors for Miller index $h=0,1,\dots,20$. This will provide us with correct Fourier amplitudes and phases.
+
+\begin{center}
+<<ch06,out.width='3.2in'>>=
+sdata <- load_structure("cyanate")
+hidx <- 0:20
+ftmp <- strufac(hidx,sdata)
+
+# This should coincide with 8(O) + 6(C) + 7(N) = 21
+ftmp$Fmod[1]
+
+# Exact analytic electron density
+rtmp0 <- structure_gauss(sdata,N=1000)
+
+# Electron density as Fourier synthesis
+rtmp1 <- fousynth(sdata$a,ftmp$Fmod,ftmp$Fpha,hidx,N=1000)
+
+# The two densities should overlap nicely
+plot(rtmp0$x,rtmp0$rr,type="l",col=2,xlab="x",
+     ylab=expression(rho))
+points(rtmp1$x,rtmp1$rr,type="l",lty=2)
+@
+\end{center}
+
+\noindent We should expect, given the very good overlap of the curves, no much difference in the coordinates of peaks' maxima for both the analytic and Fourier-synthesisdensities.
+
+<<ch07>>=
+idx0 <- local_maxima(rtmp0$rr)  # Analytic-density case
+idx1 <- local_maxima(rtmp1$rr)  # Fourier-synthesis case
+for (i in 1:length(idx)) {
+  line <- sprintf("%5.3f  %5.3f  %5.3f\n",
+           rtmp0$x[idx0[i]],rtmp1$x[idx1[i]],sdata$x0[i])
+  cat(line)
+}
+@
+
+\section{Correct phases and biased Fourier amplitudes}
+The Fourier amplitudes derived from experimental data are in general affected by experimental errors. This is reflected in their values being different from the corresponding calculated values. As seen in Tutorial 01, experimental (or \emph{observed}) amplitudes can be loaded in memory using the function \texttt{load\_data}. A comparison between calculated and experimental amplitudes is carried out in the following snippet code.
+
+<<ch08>>=
+fdata <- load_data(sname="cyanate")
+
+# Names of fdata elements
+ntmp <- names(fdata)
+for (a in ntmp) {
+  ltmp <- sprintf("%s  ",a)
+  cat(ltmp)
+}
+
+# The experimental amplitudes are available only 
+# for 11 Miller indices (no h=0 term as it's not
+# experimentally available)
+hidx <- fdata$hidx
+hidx
+
+# Let's re-compute calculated s.f.
+ftmp <- strufac(hidx,sdata)
+
+# The observed amplitudes should be slightly different
+# from the correct amplitudes.
+# The available experimental precision is to 3 decimals
+for (i in 1:length(hidx)) {
+  line <- sprintf("%10.3f  %10.3f\n",
+                   fdata$Fobs[i],ftmp$Fmod[i])
+  cat(line)
+}
+
+# The phases are the same (as they are calculated)
+# The available precision is to 1 decimal. 
+for (i in 1:length(hidx)) {
+  line <- sprintf("%10.1f  %10.1f\n",
+                   fdata$Phicalc[i],ftmp$Fpha[i])
+  cat(line)
+}
+@
+
+\noindent As the amplitudes of the structure factors are not exactly equal, some mild electron density differences are to be expected. These can be reflected in atomic (peak) coordinates difference.
 
 
 %\subsection*{Acknowledgements}

@@ -80,3 +80,81 @@ generate_global_vars <- function()
   # Save all data
   use_data(ksigma,anoK,internal=TRUE)
 }
+
+# Use the following function only once to create all "*_h.dat" data files
+# under inst/extdata. The function has to be sourced from an RStudio
+# session in directory "crone". The files produced will be 
+# automatically copied in inst/extdata/.
+generate_h_data <- function() {
+  # beryllium_fluoride
+  sdata <- load_structure("beryllium_fluoride")
+  hidx <- 1:10
+  ftmp <- strufac(hidx,sdata)
+  vx0err <- 0.15
+  set.seed(9195)
+  ftmp2 <- sfobs(hidx,sdata,vx0err)
+  fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,
+                             Fobs=ftmp2$F,sigFobs=ftmp2$sF,
+                             Phicalc=ftmp$Fpha)
+  write_h("inst/extdata/beryllium_fluoride",fdata)
+  
+  # carbon_dioxide
+  sdata <- load_structure("carbon_dioxide")
+  hidx <- 1:10
+  ftmp <- strufac(hidx,sdata)
+  vx0err <- 0.15
+  set.seed(9196)
+  ftmp2 <- sfobs(hidx,sdata,vx0err)
+  fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,
+                             Fobs=ftmp2$F,sigFobs=ftmp2$sF,
+                             Phicalc=ftmp$Fpha)
+  write_h("inst/extdata/carbon_dioxide",fdata)
+  
+  # cyanate
+  sdata <- load_structure("cyanate")
+  hidx <- 1:10
+  ftmp <- strufac(hidx,sdata)
+  vx0err <- 0.15
+  set.seed(9197)
+  ftmp2 <- sfobs(hidx,sdata,vx0err)
+  fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,
+                             Fobs=ftmp2$F,sigFobs=ftmp2$sF,
+                             Phicalc=ftmp$Fpha)
+  write_h("inst/extdata/cyanate",fdata)
+  
+  # nitronium
+  sdata <- load_structure("nitronium")
+  hidx <- 1:20
+  ftmp <- strufac(hidx,sdata)
+  vx0err <- 0.01
+  set.seed(9198)
+  ftmp2 <- sfobs(hidx,sdata,vx0err)
+  fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,
+                             Fobs=ftmp2$F,sigFobs=ftmp2$sF,
+                             Phicalc=ftmp$Fpha)
+  write_h("inst/extdata/nitronium",fdata)
+  
+  # thiocyanate
+  sdata <- load_structure("thiocyanate")
+  hidx <- 1:10
+  ftmp <- strufac(hidx,sdata)
+  vx0err <- 0.15
+  set.seed(9199)
+  ftmp2 <- sfobs(hidx,sdata,vx0err)
+  fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,
+                             Fobs=ftmp2$F,sigFobs=ftmp2$sF,
+                             Phicalc=ftmp$Fpha)
+  write_h("inst/extdata/thiocyanate",fdata)
+  
+  # xenon_difluoride
+  sdata <- load_structure("xenon_difluoride")
+  hidx <- 1:20
+  ftmp <- strufac(hidx,sdata)
+  vx0err <- 0.15
+  set.seed(9200)
+  ftmp2 <- sfobs(hidx,sdata,vx0err)
+  fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,
+                             Fobs=ftmp2$F,sigFobs=ftmp2$sF,
+                             Phicalc=ftmp$Fpha)
+  write_h("inst/extdata/xenon_difluoride",fdata)
+}
