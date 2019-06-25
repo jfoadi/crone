@@ -2,7 +2,7 @@
 % Please edit documentation in R/various.R
 \name{local_maxima}
 \alias{local_maxima}
-\title{Find local maxima in a vector of real values}
+\title{Find local maxima in a vector of real values.}
 \usage{
 local_maxima(x)
 }
@@ -14,7 +14,7 @@ A vector of integers corresponding to local maxima positions
 in vector x
 }
 \description{
-Find local maxima in a vector of real values
+Find local maxima in a vector of real values.
 }
 \examples{
 t <- seq(-10,10,length=1000)

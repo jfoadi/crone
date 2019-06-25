@@ -38,7 +38,7 @@
 
 # Auxiliary functions
 
-#' Find local maxima in a vector of real values
+#' Find local maxima in a vector of real values.
 #'
 #' @param x  A vector of real numbers 
 #' @return A vector of integers corresponding to local maxima positions 
@@ -48,18 +48,25 @@
 #' x <- dnorm(t,mean=3)+dnorm(t,mean=7)
 #' yM <- local_maxima(x)
 #' @export
-local_maxima <- function(x)
-{
-  # Use -Inf instead if x is numeric (non-integer)
-  y <- diff(c(-.Machine$integer.max, x)) > 0L
-  rle(y)$lengths
-  y <- cumsum(rle(y)$lengths)
-  y <- y[seq.int(1L, length(y), 2L)]
-  if (x[[1]] == x[[2]])
-  {
+local_maxima <- function(x){
+  # Local and global maxima (excluding origin)
+  y <- which(diff(c(TRUE,diff(x)>=0,FALSE))<0)
+  
+  # Clean y of 1 and/or length(x)
+  if (1 %in% y) {
     y <- y[-1]
   }
-
+  if ((length(y) > 0) && (length(x) %in% y)) {
+    y <- y[-length(y)]
+  }
+  
+  # Do we add peak at the origin?
+  z <- c(x[(length(x)-9):length(x)],x[1:10])
+  zz <- which(diff(c(TRUE,diff(z)>=0,FALSE))<0)
+  if (10 %in% zz || 11 %in% zz) {
+    y <- c(1,y)
+  }
+  
   return(y)
 }
 

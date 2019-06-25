@@ -1,0 +1,200 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\author{James Foadi \\ 
+        email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
+\date{}
+
+\title{Tutorial 2: The effects of symmetry}
+
+%\VignetteIndexEntry{The effects of symmetry}
+%\VignetteEngine{knitr::knitr}
+
+
+\begin{document}
+
+\maketitle
+
+\noindent Real 3D crystals are characterised by an enormous variety of symmetric patterns. There are, indeed, 230 symmetry groups of transformations associated with 3D crystal structures. For 1D crystals there exist only two types of symmetry groups, $P1$ and $P\bar{1}$; in fact, only the second provides symmetry transformations as the first group corresponds to the identity transformation, i.e. to no transformation at all. In this tutorial we will work with carbon dioxide, a $P\bar{1}$ crystal structure, and we will demonstrate how symmetry manifests itself both in direct and reciprocal space.
+
+\section{The symmetry of carbon dioxide}
+Let's load carbon dioxide from the internal \texttt{crone} library, calculate the exact analytic electron density and plot it.
+
+\begin{center}
+<<ch01,out.width='3.2in'>>=
+library(crone)
+sdata <- load_structure("carbon_dioxide")
+sdata$a  # Length of unit cell
+rtmp <- structure_gauss(sdata)
+sdata$Z  # Only two atoms in this structure?
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho),
+     ylim=c(-1,max(rtmp$rr)))
+segments(sdata$x[1],0,sdata$x[2],0,lwd=2)
+points(sdata$x[1],0,pch=16,cex=3,col="red")
+points(sdata$x[2],0,pch=16,cex=3,col="grey")
+abline(v=0.5*sdata$a,lty=2,col="blue")
+@
+\end{center}
+
+\noindent It looks like the electron density has a point of symmetry at $x=a/2$, that there are three peaks and that the two external and highest peaks are symmetric with respect to the second peak. This structure, indeed, manifests the $P\bar{1}$ symmetry: each atom at position $x$ has a symmetry-equivalent atom at position $-x$. As $-x$ is outside the range $[0,a]$, it is translated back inside that range with the addition of $a$. This means that to every atom A at position $x$ in the cell corresponds an identical atom A at position $a-x$. In the carbon dioxide case this means that there should be 4 atoms, two oxygens and two carbons. In fact, carbon dioxide is made only of 3 atoms. The carbon atom falls at a special position, $x=a/2$, so that the symmetry-related position $a-x$ is $a-a/2=a/2$, i.e. the starting position. It would therefore appear that there are two carbon atoms at the same position which, obviously, cannot be true. To obviate to this by-product of the symmetry operation, a multiplicative factor is introduced to divide this double contribution by 2. This number is called \emph{occupancy}; it is 1 for atoms not in special positions (the only special positions in 1D crystallography are $x=0,0.5,1$) and 0.5 for atoms in special positions. Let's verify this by exploring \texttt{sdata}.
+
+<<ch02>>=
+sdata$x0
+sdata$Z
+sdata$occ
+@
+
+\noindent The missing atom in the previous picture, the one corresponding to the third peak, is therefore an oxygen atom at position,
+
+<<ch03>>=
+xx <- sdata$a-sdata$x0[1]
+xx
+
+# The two oxygens have same distance from the carbon
+sdata$x0[2]-sdata$x0[1]
+xx-sdata$x0[2]
+@
+
+\noindent In \texttt{crone} one is not required to produce all symmetry-equivalent atoms on an \emph{ad hoc} basis. An \emph{expanded} structure is created with the function \texttt{expand\_to\_cell}. Obviously this expansion is automatically performed inside the function \texttt{structure\_gauss} and for this reason the electron density plotted before was symmetric. What done earlier can be repeated, this time using the expanded version of carbon dioxide.
+
+\begin{center}
+<<ch04,out.width='3.2in'>>=
+sdata_exp <- expand_to_cell(sdata)
+
+# We can see that there are two oxygens and one carbon now
+sdata_exp$Z
+
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho),
+     ylim=c(-1,max(rtmp$rr)))
+segments(sdata_exp$x[1],0,sdata_exp$x[3],0,lwd=2)
+points(sdata_exp$x[1],0,pch=16,cex=3,col="red")
+points(sdata_exp$x[2],0,pch=16,cex=3,col="grey")
+points(sdata_exp$x[3],0,pch=16,cex=3,col="red")
+abline(v=0.5*sdata_exp$a,lty=2,col="blue")
+@
+\end{center}
+
+\noindent Just to stress the importance of having the occupancy for the carbon set to 0.5, let's change it to 1. What will the electron density look like?
+
+\begin{center}
+<<ch05,out.width='3.2in'>>=
+sdata$occ
+sdata$occ[2] <- 1  # Change carbon occupancy to 1
+rtmp <- structure_gauss(sdata)
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho),
+     ylim=c(-1,max(rtmp$rr)))
+@
+\end{center}
+
+The software reacts with a warning and the electron density is clearly wrong as the peak corresponding to carbon is too high. The occupancy could have been changed to a value not violating occupancy rules; in this case there is no warning, but the electron density still does not resemble an ordinary electron density for carbon dioxide. This can happen if in the 1D crystal lattice the carbon atom has not been included in all cells, but only in a fraction of them.
+
+\begin{center}
+<<ch06,out.width='3.2in'>>=
+sdata$occ
+sdata$occ[2] <- 0.3  # Change carbon occupancy to 0.3
+rtmp <- structure_gauss(sdata)
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho),
+     ylim=c(-1,max(rtmp$rr)))
+@
+\end{center}
+
+\noindent This \emph{crystal defect} is shown as the average electron density (resulting from all cells composing the lattice) lower than it should at the carbon position.
+
+\section{The effect of symmetry on the structure factors}
+The Friedel's law means that the amplitude of the structure factor with Miller index $-h$ is equal to the amplitude of the structure factor with Miller index $h$,
+\begin{equation*}
+| F_{-h} | = | F_h |
+\end{equation*}
+and that one of the two phases is the negative of the other,
+\begin{equation*}
+\varphi_{-h} = -\varphi_h
+\end{equation*}
+When the symmetry of a crystal structure is $P\bar{1}$, a consequence of the Friedel's law is that the phases can only take the two values $0^o$ and $180^o$. This means that the structure factors corresponding to a $P\bar{1}$ crystal structure are real numbers (positive when the angle is $0^o$ or negative when the angle is $180^o$). This restriction can be verified straight away with the function \texttt{strufac} applied to carbon dioxide.
+
+<<ch07>>=
+hidx = -3:3
+ftmp <- strufac(hidx,sdata)
+
+# Structure factors corresponding to -1 and 1
+c(ftmp$Fmod[3],ftmp$Fmod[5])
+c(ftmp$Fpha[3],ftmp$Fpha[5])
+
+# Structure factors corresponding to -2 and 2
+c(ftmp$Fmod[2],ftmp$Fmod[6])
+c(ftmp$Fpha[2],ftmp$Fpha[6])
+
+# Structure factors corresponding to -2 and 2
+c(ftmp$Fmod[1],ftmp$Fmod[7])
+c(ftmp$Fpha[1],ftmp$Fpha[7])
+@
+
+\section{A random $P\bar{1}$ crystal structure}
+To practice with the $P\bar{1}$ symmetry, let's create from scratch a structure with 5 different cold atoms (B factor equal to 0) placed at random positions in the cell. This exercise will also be useful to explore the \texttt{sdata} list in details.
+
+\begin{center}
+<<ch08,out.width='3.8in'>>=
+sdata <- list()
+sdata$a <- 50   # Unit cell length is fixed at 50 angstroms
+sdata$SG <- "P-1"  # Symmetry
+set.seed(9196)
+sdata$x0 <- runif(5,min=0,max=0.5*sdata$a)  # Populate half the cell
+
+# Light elements
+set.seed(9197)
+sdata$Z <- sample(c(3:9,11:17),size=5,replace=FALSE)
+sdata$Z
+sdata$B <- rep(0,length=5)  # Cold atoms
+sdata$occ <- rep(1,length=5)  # Standard occupancies
+
+# Generate and display electron density
+rtmp <- structure_gauss(sdata)
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
+@
+\end{center}
+
+\noindent In order to identify the random atoms selected we can make use of the dataframe \texttt{atoms} in \texttt{crone}.
+
+<<ch09>>=
+names(atoms)
+
+# Find atom names corresponding to given Z
+idx <- c()
+for (i in 1:5) {
+  jdx <- which(atoms$Z == sdata$Z[i])
+  idx <- c(idx,jdx)
+}
+atoms[idx,]
+
+# These are the elements
+atoms$anames[idx]
+@
+
+\noindent The nitrogen in the plot is very close to the origin; its symmetry-equivalent is, thus, also very close to the origin. The two close peaks appear as broken because of the portion of unit cell displayed. Using a grid with a different cell extent avoids the breaking of peaks.
+
+\begin{center}
+<<ch10,out.width='3.2in'>>=
+xgrid <- seq(-0.5*sdata$a,0.5*sdata$a,length=1000)
+rtmp <- structure_gauss(sdata,x=xgrid)
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
+@
+\end{center}
+
+\noindent The close peaks can be zoomed in, once again, by choosing a different grid.
+
+\begin{center}
+<<ch11,out.width='3.2in'>>=
+xgrid <- seq(-0.04*sdata$a,0.04*sdata$a,length=1000)
+rtmp <- structure_gauss(sdata,x=xgrid)
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
+@
+\end{center}
+
+%\subsection*{Acknowledgements}
+%I would like to acknowledge the many stimulating and helpful comments
+
+%\printbibliography
+
+\end{document}

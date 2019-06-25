@@ -1,0 +1,70 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage[backend=biber]{biblatex}
+
+\bibliography{BIBLIOGRAPHY}
+
+\author{James Foadi \\ 
+        email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
+\date{June, 2019}
+
+\title{Tutorial 3: Approximate phases and peak search}
+
+%\VignetteIndexEntry{Approximate phases and peak search}
+%\VignetteEngine{knitr::knitr}
+
+<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
+#system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
+@
+
+\begin{document}
+
+\maketitle
+
+\noindent This tutorial follows part of the demonstration in reference \cite{crn}.
+
+\section{Peak search with \texttt{local\_maxima}}
+The main goal of structural crystallography is to find the positional coordinates of all atoms in a given structure. The quantity that can be calculated using the experimental data is the electron density. The atomic coordinates can be extracted from the electron density as positions corresponding to the density peaks' maxima. The function in \texttt{crone} responsible for extracting such maxima is \texttt{local\_maxima}. In order to appreciate how this function works, let's load the structure called \emph{cyanate}.
+
+<<ch01>>=
+library(crone)
+sdata <- load_structure("cyanate")
+sdata
+@
+
+\noindent From the data in the list \texttt{sdata} we can create the exact analytic electron density using function \texttt{structure\_gauss}.
+
+<<ch02,out.width='3.2in'>>=
+rtmp <- structure_gauss(sdata,N=1000) # Grid with 1000 points
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho),
+     ylim=c(-1,max(rtmp$rr)))
+@
+
+\noindent This structure is made of three atoms (three peaks), roughly located between 0 and 1, close to 2 and close to 3. In order to find out the correct location of the peaks, and thus the coordinates of the atoms, we make use of \texttt{local\_maxima}. The maxima and minima in the electron density are returned as integers corresponding to specific cells of the electron density array.
+
+<<ch03>>=
+idx <- local_maxima(rtmp$rr)
+idx
+@
+
+\noindent Such indices can then be used in conjunction with the electron density to find out which integer corresponds to maxima and, accordingly, display the peaks' location.
+
+<<ch04,out.width='3.2in'>>=
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho),
+     ylim=c(-1,max(rtmp$rr)))
+for (i in 1:length(idx)) {
+  points(rtmp$x[idx[i]],rtmp$rr[idx[i]],pch=16,cex=1.5,col=2)
+}
+@
+
+
+%\subsection*{Acknowledgements}
+%I would like to acknowledge the many stimulating and helpful %comments
+
+\printbibliography
+
+
+\end{document}
