@@ -17,7 +17,7 @@
 %\VignetteEngine{knitr::knitr}
 
 <<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
-system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
+#system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
 @
 
 
@@ -166,7 +166,13 @@ The structure factors related to a specific structure can be loaded with the fun
 
 <<ch09>>=
 fdata <- load_data(sname="thiocyanate")
-names(fdata)
+
+# Names of fdata elements
+ntmp <- names(fdata)
+for (a in ntmp) {
+  ltmp <- sprintf("%s  ",a)
+  cat(ltmp)
+}
 
 # Comparison between observed and calculated amplitudes
 fdata$hidx[1:4]
@@ -179,7 +185,7 @@ fdata$Phicalc[1:4]
 Fpha[2:5]
 @
 
-\noindent The small differences between the previously-calculated structure factors and the loaded ones is due to experimental errors being artificially introduced when simulating the observed structure factors (see \cite{crn})
+\noindent The small differences between the previously-calculated structure factors' amplitudes and the loaded ones is due to experimental errors being artificially introduced when simulating the observed structure factors (see \cite{crn}).
 
 
 

@@ -137,17 +137,27 @@ To practice with the $P\bar{1}$ symmetry, let's create from scratch a structure 
 \begin{center}
 <<ch08,out.width='3.8in'>>=
 sdata <- list()
-sdata$a <- 50   # Unit cell length is fixed at 50 angstroms
-sdata$SG <- "P-1"  # Symmetry
+
+# Unit cell length is fixed at 50 angstroms
+sdata$a <- 50 
+
+# Symmetry
+sdata$SG <- "P-1"
+
+# Populate half the cell
 set.seed(9196)
-sdata$x0 <- runif(5,min=0,max=0.5*sdata$a)  # Populate half the cell
+sdata$x0 <- runif(5,min=0,max=0.5*sdata$a)
 
 # Light elements
 set.seed(9197)
 sdata$Z <- sample(c(3:9,11:17),size=5,replace=FALSE)
 sdata$Z
-sdata$B <- rep(0,length=5)  # Cold atoms
-sdata$occ <- rep(1,length=5)  # Standard occupancies
+
+# Cold atoms
+sdata$B <- rep(0,length=5)
+
+# Standard occupancies
+sdata$occ <- rep(1,length=5)
 
 # Generate and display electron density
 rtmp <- structure_gauss(sdata)
