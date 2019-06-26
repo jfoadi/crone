@@ -466,13 +466,14 @@ invfousynth <- function(a,rho,hidx)
   
   # Check numbers are compatible
   hmax <- max(abs(hidx))
-  if (hmax >= 0.5*N) stop("Grid too coarse. Increase max Miller index.")
+  if (hmax >= 0.5*N) 
+    stop("Grid too coarse. Decrease max Miller index, or increase grid sampling.")
   
   # Inverse Fourier transform
   G <- a*fft(rho,inverse=TRUE)/N
   
   # Temporary structure factors holder
-  tmpF <- G[1:(hmax+1)]
+  #tmpF <- G[1:(hmax+1)]
   
   # Final structure factors
   fullidx <- 0:hmax
@@ -482,9 +483,9 @@ invfousynth <- function(a,rho,hidx)
   # Amplitudes and phases
   Fmod <- Mod(F)
   Fpha <- Arg(F)*180/pi
-  idx <- which(abs(Im(F)) < 0.000001 & Re(F) >= 0.000001 & Re(F) > 0)
+  idx <- which(abs(Im(F)) < 0.000001 & abs(Re(F)) >= 0.000001 & Re(F) > 0)
   Fpha[idx] <- 0.0
-  idx <- which(abs(Im(F)) < 0.000001 & Re(F) >= 0.000001 & Re(F) < 0)
+  idx <- which(abs(Im(F)) < 0.000001 & abs(Re(F)) >= 0.000001 & Re(F) < 0)
   Fpha[idx] <- 180.0
   
   return(list(Fmod=Fmod,Fpha=Fpha))
@@ -735,3 +736,115 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
   
   return(list(F=Ffinal,sF=sFfinal))
 }
+  
+  #' Simulation of 1D diffraction pattern
+  #' 
+  #' Analytic Fourier transform of electron density corresponding to
+  #' an array of \code{Ncell} unit cells calculated using numerical 
+  #' integration with the trapezoid rule. The diffraction peaks' height is 
+  #' proportional to the number of unit cells ( \code{Ncell}). The 
+  #' number of diffraction peaks included in the 1D diffraction pattern is 
+  #' related to the maximum resolution \code{D} provided in the input. 
+  #' The number of grid points for both the simulated electron density and
+  #' the resulting diffraction pattern can also be provided as input. A
+  #' further input parameter is the radius of the beamstop disc to stop
+  #' diffraction close to the incoming beam (as the risulting intensity far
+  #' outweight the rest of the diffracted intensities).
+  #' 
+  #' @param sdata A named list, normally obtained through the use of
+  #'  functions \code{\link{read_x}} or \code{\link{standardise_sdata}}. 
+  #'  The list names correspond to different object types:
+  #'  \itemize{
+  #'    \item{a.     Real numeric. The size of the unit cell.}
+  #'    \item{SG.    Character string. Space group symbol; either "P1" 
+  #'                 or "P-1"}
+  #'    \item{x0.    Vector of real numerics indicating the expanded atomic
+  #'                 positions in the unit cell.}
+  #'    \item{Z.     Vector of integers indicating the expanded 
+  #'                 atomic numbers for all atoms in the unit cell.}
+  #'    \item{B.    Vector of real numerics indicating the expanded 
+  #'                B factors for all atoms in the unit cell.}
+  #'    \item{occ.  Vector of real numerics indicating the expanded 
+  #'                occupancies for all atoms in the unit cell.}
+  #'  }
+  #' @param D Real numeric. Maximum resolution in angstroms.
+  #' @param Ncell Positive integer. \code{2*Ncell} is the number of unit cells in 
+  #'    the 1D crystal. The default value is \code{Ncell=5}.
+  #' @param N Positive integer indicating the number of grid points for the
+  #'    electron density. The default value is \code{N=1000}.
+  #' @param n Positive integer determining the reciprocal space grid. The
+  #'    grid is made of \code{2*n+1} regularly-spaced points from \code{-1/D} 
+  #'    to \code{1/D}. The value 0 is always at the centre of the grid. The 
+  #'    default value is \code{n=100}.
+  #' @param bstop Real numeric. Is the radius of the backstop disc. Intensities
+  #'    at points closer to the origin than \code{bstop} are reduced to 
+  #'    0. The presence of a backstop improves the contrast for all diffracted
+  #'    intensities because it gets rid of the overwhelming intensity corresponding
+  #'    to the origin of the reciprocal space. The default is not to include
+  #'    any backstop.
+  #' @return A named list with two vectors of real numbers, the values of the
+  #'    reciprocal space grid points (in 1/angstrom units) \code{hstar} 
+  #'    and the intensities \code{Imod}.
+  #' @examples 
+  #' # Diffraction from just two unit cells of cyanate
+  #' sdata <- load_structure("cyanate")
+  #' 
+  #' # Max resolution is 1 angstroms; no backstop
+  #' ltmp <- diffraction(sdata,D=1,Ncell=1)
+  #' 
+  #' # Plot diffraction pattern
+  #' plot(ltmp$hstar,ltmp$Imod,type="l",
+  #'  xlab=expression(paste("h"^"*")),ylab="Intensity")
+  #' 
+  #' # Diffraction from 20 unit cells with backstop of 20 angstroms diametre
+  #' ltmp <- diffraction(sdata,D=1,bstop=10)
+  #' plot(ltmp$hstar,ltmp$Imod,type="l",
+  #'  xlab=expression(paste("h"^"*")),ylab="Intensity")
+  #' 
+  #' 
+  #' @export
+diffraction <- function(sdata,D,Ncell=5,N=1000,n=100,bstop=NULL) {
+  # Grid
+  x <- seq(-Ncell*sdata$a,Ncell*sdata$a,length=N)
+  
+  # Build analytic density
+  rtmp <- structure_gauss(sdata,x=x)
+  
+  # Electron density
+  rho <- rtmp$rr
+  
+  # Grid for the reciprocal space
+  hstar <- seq(-1/D,0,length=(n+1))
+  hstar <- c(hstar[1:(length(hstar)-1)],seq(0,1/D,length=(n+1)))
+  
+  # Final real and imaginary parts
+  fRe <- rep(0,times=length(hstar))
+  fIm <- rep(0,times=length(hstar))
+  
+  # Outer loop (over values of h)
+  for (i in 1:length(hstar)) {
+    # Value of reciprocal-space variable
+    h <- hstar[i]
+    
+    # Inner loop (numerical integration over x)
+    rhoRe <- rho * cos(2*pi*h*x)
+    rhoIm <- rho * sin(2*pi*h*x)
+    
+    # Numerical integration (trapezoid rule)
+    fRe[i] <- sum(diff(x) * (head(rhoRe,-1)+tail(rhoRe,-1)))/2
+    fIm[i] <- sum(diff(x) * (head(rhoIm,-1)+tail(rhoIm,-1)))/2
+  }
+  
+  # Diffraction intensities
+  Imod <- sqrt(fRe^2+fIm^2)
+  
+  # Zero backstop area if requested
+  if(!is.null(bstop)) {
+    Dstop <- 1/bstop
+    idx <- which(abs(hstar)-Dstop <= 0)
+    Imod[idx] <- 0
+  }
+  
+  # Output
+  return(list(hstar=hstar,Imod=Imod))
+}  

@@ -157,4 +157,16 @@ generate_h_data <- function() {
                              Fobs=ftmp2$F,sigFobs=ftmp2$sF,
                              Phicalc=ftmp$Fpha)
   write_h("inst/extdata/xenon_difluoride",fdata)
+  
+  # pinkerton2015
+  sdata <- load_structure("pinkerton2015")
+  hidx <- 1:12
+  ftmp <- strufac(hidx,sdata)
+  vx0err <- 0.15
+  set.seed(9200)
+  ftmp2 <- sfobs(hidx,sdata,vx0err)
+  fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,
+                             Fobs=ftmp2$F,sigFobs=ftmp2$sF,
+                             Phicalc=ftmp$Fpha)
+  write_h("inst/extdata/pinkerton2015",fdata)
 }

@@ -1,0 +1,39 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage[backend=biber,sorting=none]{biblatex}
+
+\bibliography{BIBLIOGRAPHY}
+
+\author{James Foadi \\ 
+        email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
+\date{June, 2019}
+
+\title{Tutorial 4: Calculations for Pinkerton}
+
+%\VignetteIndexEntry{Calculations for Pinkerton}
+%\VignetteEngine{knitr::knitr}
+
+<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
+#system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
+@
+
+\begin{document}
+
+\maketitle
+
+\noindent Prior to the publication of reference \cite{crn} there have been at least two excellent introductions to 1D structural crystallography (see \cite{stoutjens},\cite{pinkerton}). Citation \cite{pinkerton} by A. A. Pinkerton is an article in which three important topics in structural crystallography are illustrated using a simple $P\bar{1}$ 1D structure made of two carbon atoms. In this tutorial we will reproduced Pinkerton's examples using tools from \texttt{crone}.
+
+\section{Unit cell refinement}
+The main goal of structura
+
+
+%\subsection*{Acknowledgements}
+%I would like to acknowledge the many stimulating and helpful %comments
+
+\printbibliography
+
+
+\end{document}

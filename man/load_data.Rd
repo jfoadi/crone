@@ -16,6 +16,7 @@ are to be loaded in the workspace. It can be one of:
   \item{nitronium}
   \item{thiocyanate}
   \item{xenon_difluoride}
+  \item{pinkerton2015}
 }
 Default is NULL, in which case the function returns a list of all
 structures available.}

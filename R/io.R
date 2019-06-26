@@ -87,6 +87,7 @@ standardise_sdata <- function(a,SG,x0,Z,B,occ)
 #'    \item{nitronium}
 #'    \item{thiocyanate}
 #'    \item{xenon_difluoride}
+#'    \item{pinkerton2015}
 #'  }
 #'  Default is NULL, in which case the function returns a list of all
 #'  structures available.
@@ -121,7 +122,8 @@ load_structure <- function(sname=NULL)
   all_names <- c("beryllium_fluoride",
                  "carbon_dioxide","cyanate",
                  "nitronium","thiocyanate",
-                 "xenon_difluoride")
+                 "xenon_difluoride",
+                 "pinkerton2015")
 
   # Load data if they exist
   if (!is.null(sname))
@@ -541,6 +543,7 @@ standardise_fdata <- function(a,SG,hidx,
 #'    \item{nitronium}
 #'    \item{thiocyanate}
 #'    \item{xenon_difluoride}
+#'    \item{pinkerton2015}
 #'  }
 #'  Default is NULL, in which case the function returns a list of all
 #'  structures available.
@@ -579,7 +582,8 @@ load_data <- function(sname=NULL)
   all_names <- c("beryllium_fluoride",
                  "carbon_dioxide","cyanate",
                  "nitronium","thiocyanate",
-                 "xenon_difluoride")
+                 "xenon_difluoride",
+                 "pinkerton2015")
   
   # Load data if they exist
   if (!is.null(sname))

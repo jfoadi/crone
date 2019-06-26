@@ -2,6 +2,7 @@
 
 export(atom_gauss)
 export(choose_a)
+export(diffraction)
 export(erf)
 export(expand_to_cell)
 export(fluorescent_scan)
