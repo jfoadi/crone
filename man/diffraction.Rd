@@ -4,7 +4,7 @@
 \alias{diffraction}
 \title{Simulation of 1D diffraction pattern}
 \usage{
-diffraction(sdata, D, Ncell = 5, N = 1000, n = 100, bstop = NULL)
+diffraction(sdata, D, Ncell = 10, N = 1000, n = 100, bstop = NULL)
 }
 \arguments{
 \item{sdata}{A named list, normally obtained through the use of
@@ -26,8 +26,8 @@ The list names correspond to different object types:
 
 \item{D}{Real numeric. Maximum resolution in angstroms.}
 
-\item{Ncell}{Positive integer. \code{2*Ncell} is the number of unit cells in 
-the 1D crystal. The default value is \code{Ncell=5}.}
+\item{Ncell}{Positive integer. It is the number of unit cells in 
+the 1D crystal. The default value is \code{Ncell=10}.}
 
 \item{N}{Positive integer indicating the number of grid points for the
 electron density. The default value is \code{N=1000}.}
@@ -46,7 +46,7 @@ any backstop.}
 }
 \value{
 A named list with two vectors of real numbers, the values of the
-   reciprocal space grid points (in 1/angstrom units) \code{hstar} 
+   reciprocal space grid points (in 1/angstrom units) \code{xstar} 
    and the intensities \code{Imod}.
 }
 \description{
@@ -70,13 +70,13 @@ sdata <- load_structure("cyanate")
 ltmp <- diffraction(sdata,D=1,Ncell=1)
 
 # Plot diffraction pattern
-plot(ltmp$hstar,ltmp$Imod,type="l",
- xlab=expression(paste("h"^"*")),ylab="Intensity")
+plot(ltmp$xstar,ltmp$Imod,type="l",
+ xlab=expression(paste("x"^"*")),ylab="Intensity")
 
 # Diffraction from 20 unit cells with backstop of 20 angstroms diametre
 ltmp <- diffraction(sdata,D=1,bstop=10)
-plot(ltmp$hstar,ltmp$Imod,type="l",
- xlab=expression(paste("h"^"*")),ylab="Intensity")
+plot(ltmp$xstar,ltmp$Imod,type="l",
+ xlab=expression(paste("x"^"*")),ylab="Intensity")
 
 
 }

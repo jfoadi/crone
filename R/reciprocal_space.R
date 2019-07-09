@@ -768,8 +768,8 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
   #'                occupancies for all atoms in the unit cell.}
   #'  }
   #' @param D Real numeric. Maximum resolution in angstroms.
-  #' @param Ncell Positive integer. \code{2*Ncell} is the number of unit cells in 
-  #'    the 1D crystal. The default value is \code{Ncell=5}.
+  #' @param Ncell Positive integer. It is the number of unit cells in 
+  #'    the 1D crystal. The default value is \code{Ncell=10}.
   #' @param N Positive integer indicating the number of grid points for the
   #'    electron density. The default value is \code{N=1000}.
   #' @param n Positive integer determining the reciprocal space grid. The
@@ -783,7 +783,7 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
   #'    to the origin of the reciprocal space. The default is not to include
   #'    any backstop.
   #' @return A named list with two vectors of real numbers, the values of the
-  #'    reciprocal space grid points (in 1/angstrom units) \code{hstar} 
+  #'    reciprocal space grid points (in 1/angstrom units) \code{xstar} 
   #'    and the intensities \code{Imod}.
   #' @examples 
   #' # Diffraction from just two unit cells of cyanate
@@ -793,19 +793,19 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
   #' ltmp <- diffraction(sdata,D=1,Ncell=1)
   #' 
   #' # Plot diffraction pattern
-  #' plot(ltmp$hstar,ltmp$Imod,type="l",
-  #'  xlab=expression(paste("h"^"*")),ylab="Intensity")
+  #' plot(ltmp$xstar,ltmp$Imod,type="l",
+  #'  xlab=expression(paste("x"^"*")),ylab="Intensity")
   #' 
   #' # Diffraction from 20 unit cells with backstop of 20 angstroms diametre
   #' ltmp <- diffraction(sdata,D=1,bstop=10)
-  #' plot(ltmp$hstar,ltmp$Imod,type="l",
-  #'  xlab=expression(paste("h"^"*")),ylab="Intensity")
+  #' plot(ltmp$xstar,ltmp$Imod,type="l",
+  #'  xlab=expression(paste("x"^"*")),ylab="Intensity")
   #' 
   #' 
   #' @export
-diffraction <- function(sdata,D,Ncell=5,N=1000,n=100,bstop=NULL) {
+diffraction <- function(sdata,D,Ncell=10,N=1000,n=100,bstop=NULL) {
   # Grid
-  x <- seq(-Ncell*sdata$a,Ncell*sdata$a,length=N)
+  x <- seq(0,Ncell*sdata$a,length=N)
   
   # Build analytic density
   rtmp <- structure_gauss(sdata,x=x)
@@ -814,17 +814,17 @@ diffraction <- function(sdata,D,Ncell=5,N=1000,n=100,bstop=NULL) {
   rho <- rtmp$rr
   
   # Grid for the reciprocal space
-  hstar <- seq(-1/D,0,length=(n+1))
-  hstar <- c(hstar[1:(length(hstar)-1)],seq(0,1/D,length=(n+1)))
+  xstar <- seq(-1/D,0,length=(n+1))
+  xstar <- c(xstar[1:(length(xstar)-1)],seq(0,1/D,length=(n+1)))
   
   # Final real and imaginary parts
-  fRe <- rep(0,times=length(hstar))
-  fIm <- rep(0,times=length(hstar))
+  fRe <- rep(0,times=length(xstar))
+  fIm <- rep(0,times=length(xstar))
   
   # Outer loop (over values of h)
-  for (i in 1:length(hstar)) {
+  for (i in 1:length(xstar)) {
     # Value of reciprocal-space variable
-    h <- hstar[i]
+    h <- xstar[i]
     
     # Inner loop (numerical integration over x)
     rhoRe <- rho * cos(2*pi*h*x)
@@ -836,15 +836,16 @@ diffraction <- function(sdata,D,Ncell=5,N=1000,n=100,bstop=NULL) {
   }
   
   # Diffraction intensities
-  Imod <- sqrt(fRe^2+fIm^2)
+  #Imod <- sqrt(fRe^2+fIm^2)
+  Imod <- fRe^2+fIm^2
   
   # Zero backstop area if requested
   if(!is.null(bstop)) {
     Dstop <- 1/bstop
-    idx <- which(abs(hstar)-Dstop <= 0)
+    idx <- which(abs(xstar)-Dstop <= 0)
     Imod[idx] <- 0
   }
   
   # Output
-  return(list(hstar=hstar,Imod=Imod))
+  return(list(xstar=xstar,Imod=Imod))
 }  

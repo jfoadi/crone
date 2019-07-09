@@ -11,7 +11,7 @@
         email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
 \date{June, 2019}
 
-\title{Tutorial 4: Calculations for Pinkerton}
+\title{Tutorial 4: Calculations for Pinkerton 2015}
 
 %\VignetteIndexEntry{Calculations for Pinkerton}
 %\VignetteEngine{knitr::knitr}
@@ -24,11 +24,193 @@
 
 \maketitle
 
-\noindent Prior to the publication of reference \cite{crn} there have been at least two excellent introductions to 1D structural crystallography (see \cite{stoutjens},\cite{pinkerton}). Citation \cite{pinkerton} by A. A. Pinkerton is an article in which three important topics in structural crystallography are illustrated using a simple $P\bar{1}$ 1D structure made of two carbon atoms. In this tutorial we will reproduced Pinkerton's examples using tools from \texttt{crone}.
+\noindent Prior to the publication of reference \cite{crn} there have been at least two excellent introductions to 1D structural crystallography (see \cite{stoutjens},\cite{pinkerton}). Citation \cite{pinkerton} by A. A. Pinkerton is an article in which three important topics in structural crystallography are illustrated using a simple $P\bar{1}$ 1D structure made of two carbon atoms. In this tutorial we will reproduce Pinkerton's examples using tools from \texttt{crone}.
 
-\section{Unit cell refinement}
-The main goal of structura
+\section{Pinkerton's structure}
+This structure is available as internal data "pinkerton2015". It is a $P\bar{1}$ structure made of two carbon atoms. The B factor is not given in reference \cite{pinkerton} and, in line with the way B factors are generated in \texttt{crone}, it has been assigned value 13.333 $\AA^2$. Data are generated in the following code snippet.
 
+\begin{center}
+<<ch01,out.width='3.2in'>>=
+library(crone)
+sdata <- load_structure("pinkerton2015")
+rtmp <- structure_gauss(sdata,N=1000)
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
+@
+\end{center}
+
+\section{Indexing and cell's length determination}
+The unit cell length is unknown before diffraction data are collected. It can be calculated using the pattern created by the diffracted intensities. In 1D crystallography this means, essentially, the distance between the diffraction peaks.\\
+In \texttt{crone} there exist a function to simulate 1D diffraction patterns starting from the 1D atomic structure. The function is called \texttt{diffraction}. It takes in the \texttt{sdata}-type list and the maximum resolution of the diffraction pattern in angstroms. It returns a named list with \texttt{xstar} as reciprocal space grid and \texttt{Imod} as diffracted intensities. One of the interesting and well-known features of a diffraction pattern is that the intensities are proportional to the square of the number of unit cells forming the crystal (equal to \texttt{Ncell}, with default value equal to 10). The following snippet demonstrates some of the possible diffraction patterns simulated with this function. More details are available in the documentation.
+
+\begin{center}
+<<ch02,out.width='3.2in'>>=
+# Max resolution 1 angstrom (D=1), crystal formed of only 
+# one unit cell (Ncell=1)
+ltmp <- diffraction(sdata,D=1,Ncell=1)
+plot(ltmp$xstar,ltmp$Imod,type="l",
+     xlab=expression(paste("x"^"*")),ylab="Intensity")
+
+# Max resolution 1 angstrom, crystal formed by 
+# two unit cells (Ncell=2)
+ltmp <- diffraction(sdata,D=1,Ncell=2)
+plot(ltmp$xstar,ltmp$Imod,type="l",
+     xlab=expression(paste("x"^"*")),ylab="Intensity")
+
+# Max resolution 1 angstrom, crystal formed by 
+# 10 unit cells (Ncell=10, default value). The number of reciprocal 
+# space grid points is inreased to 1001 (n=500 -> 2*n+1=1001; 
+# default value is n=100 -> 2*n+1=201)
+ltmp <- diffraction(sdata,D=1,n=500)
+plot(ltmp$xstar,ltmp$Imod,type="l",
+     xlab=expression(paste("x"^"*")),ylab="Intensity")
+
+@
+\end{center}
+
+\noindent The interference effect for 10 unit cells is strong enough to make the diffraction pattern appear very similar to a diffraction pattern from an infinite crystal. It is also easy to see that the distance between adjacent peaks is around 0.1, which is the reciprocal of $1/a$, $a$ being $10\AA$ for this structure. From the practical point of view, one of the first tasks to be carried out in structural crystallography is the determination of the diffraction spots' position (in 1D the spots are the peaks' maxima) and the accurate calculation of the unit cell length.\\
+\newline
+\noindent In order to find the maxima's position we can use the function \texttt{local\_maxima} and, amond all peaks found, filter those higher than a given threshold. The value of this threshold is obviously key to the determination of the appropriate diffraction geometry and correct cell's length.
+
+\begin{center}
+<<ch03,out.width='3.2in'>>=
+# Find all peaks
+idx <- local_maxima(ltmp$Imod)
+
+# Mean and standard deviation of electron density
+M <- mean(ltmp$Imod)
+S <- sd(ltmp$Imod)
+
+# Threshold (1st attempt)
+Thr <- M + 0*S
+Thr
+
+# Peaks (spots) selection
+idx <- local_maxima(ltmp$Imod)
+jdx <- which(ltmp$Imod[idx] > Thr)
+idx <- idx[jdx]  # New index of selected peaks
+length(idx)
+
+# Too many peaks (some should be considered as noise)
+plot(ltmp$xstar,ltmp$Imod,type="l",
+     xlab=expression(paste("x"^"*")),ylab="Intensity")
+points(ltmp$xstar[idx],ltmp$Imod[idx],pch=16,cex=0.65,col=2)
+
+# Threshold (2nd attempt)
+Thr <- M + 1*S
+Thr
+
+# Peaks (spots) selection
+idx <- local_maxima(ltmp$Imod)
+jdx <- which(ltmp$Imod[idx] > Thr)
+idx <- idx[jdx]  # New index of selected peaks
+length(idx)
+
+# Some peaks have been missed
+plot(ltmp$xstar,ltmp$Imod,type="l",
+     xlab=expression(paste("x"^"*")),ylab="Intensity")
+points(ltmp$xstar[idx],ltmp$Imod[idx],pch=16,cex=0.65,col=2)
+@
+\end{center}
+
+\noindent When the threshold is increased, some of the weaker diffreaction maxima are missed. When the number of maxima found is sufficient for a correct indexing, then one can proceed to cell-length determination. In this specific case we found 9 peaks; one is the peak corresponding to $h=0$. The other 8 peaks are symmetric with respect to $x^{*}=0$; half of them correspond to negative Miller indices and half to positive Miller indices. There is also a gap (see diffraction picture) between the third and the fifth diffraction maximum because the fourth is a weak diffraction spot and has a value smaller than the threshold adopted. Therefore we have the following indices $-5,-3,-2,-1,0,1,2,3,5$ corresponding to the $x^{*}$ values of the centre of the peaks in reciprocal space. The relation is the one defining the crystallographic resolution $d=1/d^{*}$ of a diffraction spot; for 1D crystallography,
+\begin{equation*}
+a^{*}h=d^{*}
+\end{equation*}
+The above relation is graphically described by a straight line passing through the origin. This line can be found using the least squares procedure from which the slope $a^{*}$ is extracted. The unit cell's length is simply $a=1/a^{*}$.
+
+\begin{center}
+<<ch04,out.width='3.2in'>>=
+# Points for the plot
+x <- c(-5,-3,-2,-1,0,1,2,3,5)
+y <- ltmp$xstar[idx]
+plot(x,y,pch=16,xlab=expression(h),
+     ylab=expression(paste("x"^"*")))
+
+# Least squares
+model <- lm(y ~ 0+x)  # Origin included
+smdl <- summary(model)
+smdl
+
+# Fit
+abline(model,col=2)
+
+# Unit cell length (approximately 10)
+a = 1/smdl$coefficients[1]
+a
+@
+\end{center}
+
+From the procedure carried out above it is quite clear that the spots selection is an essential and key part of cell determination. The threshold adopted (and thus the inclusion of noise rather than the signal) is important for both the correct indexing and unit cell determination.\\
+\newline
+\noindent Once the unit cell's length is found, the reciprocal lattice can be re-created and the intensities at the lattice point scan be extracted. This process is normally known as \emph{data integration}. We can create the reciprocal lattice as repetition of equally-spaced points of width $a^{*}=1/a$, where $a\approx 9.995$.
+
+\begin{center}
+<<ch05,out.width='3.2in'>>=
+# Lattice
+hidx <- -10:10
+astar <- smdl$coefficients[1]
+L <- astar * hidx
+
+# Lattice overlapped to diffraction pattern
+plot(ltmp$xstar,ltmp$Imod,type="l",
+     xlab=expression(paste("x"^"*")),ylab="Intensity")
+abline(v=L,col=3)
+@
+\end{center}
+
+\noindent The integrated intensities can be found as areas under the curves centred at the specified lattice points. This operation can be carried out in many possible ways. For example, one can simply decide a symmetric interval centred at the specific lattice point and add up all intensities of the grid points included within the interval. Or, a gaussian curve centred at the lattice point could be fitted to the local set of diffracted intensities and the integrated intensity calculated as area of the gaussian curve found. Such methods are certainly certainly here implementable, but they require a considerable amount of additional code and are, thus, skipped.
+
+\section{The Patterson function}
+\noindent The \emph{Patterson function} is calculated as Fourier synthesis with structure factors having squared moduli, $|F_h|^2$, as amplitudes and zeros as phases, $\varphi_h=0$. The corresponding density is symmetric with respect to the origin, has a huge peak at the origin and the peaks' position is quantitatively equivalent to an inter-atomic distance, i.e. the distance between two atomic peaks in the unit cell. Let's explore the Patterson function for the pinkerton2015 structure.
+
+\begin{center}
+<<ch06,out.width='3.2in'>>=
+# Miller indices
+hidx <- 0:20
+
+# Structure factors
+ftmp <- strufac(hidx,sdata)
+
+# What's in the structure factor list
+names(ftmp)
+
+# Amplitudes and phases for the Patterson
+Pmod <- ftmp$Fmod^2
+Ppha <- rep(0,times=length(hidx))
+
+# Patterson as Fourier synthesis
+rtmp <- fousynth(sdata$a,Pmod,Ppha,hidx,N=1000)
+plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab="P")
+@
+\end{center}
+
+\noindent The huge peak at the origin is self-evident. Let's next measure the position of the smaller peaks; this should correspond to the two distances between the two carbons, i.e. between the carbon and its symmetry-equivalent on one side and the other with respect to the origin). We can carry out the calculation using the function to find maxima.
+
+<<ch07>>=
+# Generate the symmetry-equivalent
+sdata2 <- expand_to_cell(sdata)
+sdata2$x0
+
+# Smaller inter-atomic distance
+sdata2$x0[1]-(-sdata2$x0[1])
+
+# Larger inter-atomic distance
+sdata2$x0[2]-sdata2$x0[1]
+
+# Peaks position
+idx <- local_maxima(rtmp$rr)
+rtmp$x[idx]
+@
+
+\noindent Thus, the position of the second and third Patterson peak coincide with the two inter-atomic distances previously calculated.
+
+
+\section{Structure factors and Fourier synthesis}
+In reference \cite{pinkerton} two sections are devoted to the computation of the structure factors and the Fourier synthesis. With \texttt{crone} these tasks are accompished by the two functions \texttt{strufac} and \texttt{fousynth} which we have used previously.
+
+
+\section{Direct Methods}
+Direct methods are defined as a certain number of probabilistic and statistical procedures to find the phases of the Fourier synthesis, starting from its amplitudes. This is, obviously, equivalent to calculate the electron density and it is, thus, one of the methods to solve crystallographic structures, i.e. to determine the atomic positions in the unit cell.
 
 %\subsection*{Acknowledgements}
 %I would like to acknowledge the many stimulating and helpful %comments
