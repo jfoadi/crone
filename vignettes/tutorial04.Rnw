@@ -9,7 +9,7 @@
 
 \author{James Foadi \\ 
         email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
-\date{June, 2019}
+\date{July, 2019}
 
 \title{Tutorial 4: Calculations for Pinkerton 2015}
 
@@ -700,9 +700,6 @@ points(rtmpC$x,rtmpC$rr,type="l",col=2)
 \end{center}
 
 \noindent The matching is not complete, but it is very good. In real applications one can never know the correct phases (or signs) and some errors are to be expected in the final electron density.
-
-%\subsection*{Acknowledgements}
-%I would like to acknowledge the many stimulating and helpful %comments
 
 \printbibliography
 

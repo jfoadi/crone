@@ -281,10 +281,6 @@ points(rtmp1$x,rtmp1$rr,type="l",lty=2)
 @
 \end{center}
 
-
-%\subsection*{Acknowledgements}
-%I would like to acknowledge the many stimulating and helpful %comments
-
 \printbibliography
 
 

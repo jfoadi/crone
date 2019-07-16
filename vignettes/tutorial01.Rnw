@@ -187,11 +187,6 @@ Fpha[2:5]
 
 \noindent The small differences between the previously-calculated structure factors' amplitudes and the loaded ones is due to experimental errors being artificially introduced when simulating the observed structure factors (see \cite{crn}).
 
-
-
-%\subsection*{Acknowledgements}
-%I would like to acknowledge the many stimulating and helpful comments
-
 \printbibliography
 
 \end{document}

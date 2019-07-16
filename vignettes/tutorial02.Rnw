@@ -202,9 +202,6 @@ plot(rtmp$x,rtmp$rr,type="l",xlab="x",ylab=expression(rho))
 @
 \end{center}
 
-%\subsection*{Acknowledgements}
-%I would like to acknowledge the many stimulating and helpful comments
-
 %\printbibliography
 
 \end{document}
