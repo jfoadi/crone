@@ -2,7 +2,7 @@ Package: crone
 Type: Package
 Title: Structural crystallography in 1D
 Version: 0.1.0
-Date: 2016-08-16
+Date: 2019-07-16
 Authors@R: person("James","Foadi",email="james.foadi@diamond.ac.uk",role=c("cre","aut"))
 Description: crone contains functions and data to carry out all major structural
     crystallography calculations in one dimension.
