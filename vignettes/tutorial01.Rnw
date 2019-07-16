@@ -16,6 +16,10 @@
 %\VignetteIndexEntry{Play with thiocyanate}
 %\VignetteEngine{knitr::knitr}
 
+<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
+system ("biber tutorial01")
+@
+
 
 \begin{document}
 
