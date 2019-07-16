@@ -16,10 +16,6 @@
 %\VignetteIndexEntry{Play with thiocyanate}
 %\VignetteEngine{knitr::knitr}
 
-<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
-system (paste ("biber", sub ("\\.Rnw$", "", current_input())))
-@
-
 
 \begin{document}
 
