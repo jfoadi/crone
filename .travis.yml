@@ -2,3 +2,10 @@
 
 language: R
 cache: packages
+
+before_install:
+  - sudo apt-get install -y biber
+addons:
+  apt:
+    update: true
+
