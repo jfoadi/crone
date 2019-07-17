@@ -13,3 +13,7 @@ Suggests: knitr
 VignetteBuilder: knitr
 Encoding: UTF-8
 Depends: R (>= 3.5.0)
+NeedsCompilation: no
+Packaged: 2019-07-17 22:37:44 UTC; james
+Author: James Foadi [cre, aut]
+Maintainer: James Foadi <j.foadi@bath.ac.uk>
