@@ -47,7 +47,7 @@ A named fdata-type list with the following elements:
 Function to load structure factors corresponding to one of the many 1D 
 structures available within the \emph{crone} package. The structure
 factors amplitudes have been generated from calculated data with some
-simulated error, so that they mimick observed data. Phases are calculated
+simulated error, so that they mimic observed data. Phases are calculated
 from the correct structure.
 }
 \examples{

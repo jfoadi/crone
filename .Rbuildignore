@@ -4,4 +4,3 @@
 ^cran-comments\.md$
 ^\.travis\.yml$
 ^README\.Rmd$
-^NEWS\.md$

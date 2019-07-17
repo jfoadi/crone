@@ -60,7 +60,7 @@ A named list with two vectors of real numbers, the structure
 Calculates structure factors corresponding to one or more 1D Miller 
 indices, given the atomic content of one unit cell. Anomalous scattering 
 can be included using logical flag "anoflag" (default is FALSE). Crystal 
-structures are always considered with no symetry. Thus a 1D structure 
+structures are always considered with no symmetry. Thus a 1D structure 
 with the P-1 symmetry will have to be expanded first with function 
 "expand_to_cell".
 }

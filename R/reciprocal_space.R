@@ -14,7 +14,7 @@
 #' @param a Real numeric. Length of 1D unit cell.
 #' @param Zj Integer numeric. Atomic number (e.g. Oxygen has Zj <- 8)
 #' @param occj Real numeric. Atomic occupancy, a real number between 0 and 1,
-#'    where 0 means that the atom is missing in the crystal and 1 mens that
+#'    where 0 means that the atom is missing in the crystal and 1 means that
 #'    is present in all unit cells of the crystal.
 #' @param Bj Real numeric. This is the B factor associated with the thermal
 #'    vibration of the atom. It is measured in squared angstroms and it is
@@ -141,7 +141,7 @@ plot_absorption_curves <- function(chem_el,zoom=NULL)
 #' Calculates structure factors corresponding to one or more 1D Miller 
 #' indices, given the atomic content of one unit cell. Anomalous scattering 
 #' can be included using logical flag "anoflag" (default is FALSE). Crystal 
-#' structures are always considered with no symetry. Thus a 1D structure 
+#' structures are always considered with no symmetry. Thus a 1D structure 
 #' with the P-1 symmetry will have to be expanded first with function 
 #' "expand_to_cell".
 #' 
@@ -748,8 +748,8 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
   #' The number of grid points for both the simulated electron density and
   #' the resulting diffraction pattern can also be provided as input. A
   #' further input parameter is the radius of the beamstop disc to stop
-  #' diffraction close to the incoming beam (as the risulting intensity far
-  #' outweight the rest of the diffracted intensities).
+  #' diffraction close to the incoming beam (as the resulting intensity far
+  #' outweigh the rest of the diffracted intensities).
   #' 
   #' @param sdata A named list, normally obtained through the use of
   #'  functions \code{\link{read_x}} or \code{\link{standardise_sdata}}. 
@@ -796,7 +796,7 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
   #' plot(ltmp$xstar,ltmp$Imod,type="l",
   #'  xlab=expression(paste("x"^"*")),ylab="Intensity")
   #' 
-  #' # Diffraction from 20 unit cells with backstop of 20 angstroms diametre
+  #' # Diffraction from 20 unit cells with backstop of 20 angstroms diameter
   #' ltmp <- diffraction(sdata,D=1,bstop=10)
   #' plot(ltmp$xstar,ltmp$Imod,type="l",
   #'  xlab=expression(paste("x"^"*")),ylab="Intensity")

@@ -16,7 +16,7 @@ of scattering curves.}
 \item{Zj}{Integer numeric. Atomic number (e.g. Oxygen has Zj <- 8)}
 
 \item{occj}{Real numeric. Atomic occupancy, a real number between 0 and 1,
-where 0 means that the atom is missing in the crystal and 1 mens that
+where 0 means that the atom is missing in the crystal and 1 means that
 is present in all unit cells of the crystal.}
 
 \item{Bj}{Real numeric. This is the B factor associated with the thermal

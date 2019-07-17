@@ -59,8 +59,8 @@ related to the maximum resolution \code{D} provided in the input.
 The number of grid points for both the simulated electron density and
 the resulting diffraction pattern can also be provided as input. A
 further input parameter is the radius of the beamstop disc to stop
-diffraction close to the incoming beam (as the risulting intensity far
-outweight the rest of the diffracted intensities).
+diffraction close to the incoming beam (as the resulting intensity far
+outweigh the rest of the diffracted intensities).
 }
 \examples{
 # Diffraction from just two unit cells of cyanate
@@ -73,7 +73,7 @@ ltmp <- diffraction(sdata,D=1,Ncell=1)
 plot(ltmp$xstar,ltmp$Imod,type="l",
  xlab=expression(paste("x"^"*")),ylab="Intensity")
 
-# Diffraction from 20 unit cells with backstop of 20 angstroms diametre
+# Diffraction from 20 unit cells with backstop of 20 angstroms diameter
 ltmp <- diffraction(sdata,D=1,bstop=10)
 plot(ltmp$xstar,ltmp$Imod,type="l",
  xlab=expression(paste("x"^"*")),ylab="Intensity")

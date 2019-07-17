@@ -22,7 +22,7 @@ Constant normalizing wrapped gaussian
 \examples{
 Z <- 16  # Sulphur atom
 sigma <- 0.05*sqrt(Z)
-a <- 15  # Uniit cell size
+a <- 15  # Unit cell size
 kk <- kgauss(sigma,a)
 print(kk)
 
