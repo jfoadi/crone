@@ -59,32 +59,34 @@ calculated structure factors amplitudes and phases, either for anomalous
 or non-anomalous data.
 }
 \examples{
-# Data from thiocyanate structure
-datadir <- system.file("extdata",package="crone")
-filename <- file.path(datadir,"thiocyanate_x.dat")
-sdata <- read_x(filename)
+\dontrun{
+   # Data from thiocyanate structure
+   datadir <- system.file("extdata",package="crone")
+   filename <- file.path(datadir,"thiocyanate_x.dat")
+   sdata <- read_x(filename)
 
-# Miller indices
-hidx <- 1:10
+   # Miller indices
+   hidx <- 1:10
 
-# Observed structure factors with errors
-ltmp <- sfobs(hidx,sdata)
-Fobs <- ltmp$F
-sigFobs <- ltmp$sF
+   # Observed structure factors with errors
+   ltmp <- sfobs(hidx,sdata)
+   Fobs <- ltmp$F
+   sigFobs <- ltmp$sF
 
-# Phases from calculated structure factors
-ftmp <- strufac(hidx,sdata)
-phicalc <- ftmp$Fpha
+   # Phases from calculated structure factors
+   ftmp <- strufac(hidx,sdata)
+   phicalc <- ftmp$Fpha
 
-# Create standardised fdata structure
-fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,Fobs=Fobs,
- sigFobs=sigFobs,Phicalc=phicalc)
+   # Create standardised fdata structure
+   fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,Fobs=Fobs,
+    sigFobs=sigFobs,Phicalc=phicalc)
  
-# Name of structure factors file (in home directory)
-homedir <- Sys.getenv("HOME")
-fname <- file.path(homedir,"test")
+   # Name of structure factors file (in home directory)
+   homedir <- Sys.getenv("HOME")
+   fname <- file.path(homedir,"test")
 
-# Write data to file
-write_h(fname,fdata)
+   # Write data to file
+   write_h(fname,fdata)
+}    
 
 }

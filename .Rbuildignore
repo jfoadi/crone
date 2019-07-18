@@ -5,5 +5,3 @@
 ^\.travis\.yml$
 ^README\.Rmd$
 ^CRAN-RELEASE$
-^test_h\.dat$
-^test_x\.dat$

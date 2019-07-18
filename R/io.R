@@ -183,16 +183,18 @@ load_structure <- function(sname=NULL)
 #'  file of name *_x.dat which contains all coordinates of the atoms in the 
 #'  structure and other type of information.
 #' @examples 
-#' # Create an arbitrary structure in P1
-#' a <- 23
-#' SG <- "P1"
-#' x0 <- c(2,11,16,19)
-#' Z <- c(6,6,16,8)
-#' B <- c(13,14,5,10)
-#' occ <- c(1,1,1,1)
-#' prfx <- "test"
-#' sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
-#' write_x(prfx,sdata)
+#' \dontrun{
+#'    # Create an arbitrary structure in P1
+#'    a <- 23
+#'    SG <- "P1"
+#'    x0 <- c(2,11,16,19)
+#'    Z <- c(6,6,16,8)
+#'    B <- c(13,14,5,10)
+#'    occ <- c(1,1,1,1)
+#'    prfx <- "test"
+#'    sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
+#'    write_x(prfx,sdata)
+#' }
 #' 
 #' @export
 write_x <- function(filename,sdata)
@@ -668,33 +670,35 @@ load_data <- function(sname=NULL)
 #'  information.
 #'  
 #' @examples
-#' # Data from thiocyanate structure
-#' datadir <- system.file("extdata",package="crone")
-#' filename <- file.path(datadir,"thiocyanate_x.dat")
-#' sdata <- read_x(filename)
+#' \dontrun{
+#'    # Data from thiocyanate structure
+#'    datadir <- system.file("extdata",package="crone")
+#'    filename <- file.path(datadir,"thiocyanate_x.dat")
+#'    sdata <- read_x(filename)
 #' 
-#' # Miller indices
-#' hidx <- 1:10
+#'    # Miller indices
+#'    hidx <- 1:10
 #' 
-#' # Observed structure factors with errors
-#' ltmp <- sfobs(hidx,sdata)
-#' Fobs <- ltmp$F
-#' sigFobs <- ltmp$sF
+#'    # Observed structure factors with errors
+#'    ltmp <- sfobs(hidx,sdata)
+#'    Fobs <- ltmp$F
+#'    sigFobs <- ltmp$sF
 #' 
-#' # Phases from calculated structure factors
-#' ftmp <- strufac(hidx,sdata)
-#' phicalc <- ftmp$Fpha
+#'    # Phases from calculated structure factors
+#'    ftmp <- strufac(hidx,sdata)
+#'    phicalc <- ftmp$Fpha
 #' 
-#' # Create standardised fdata structure
-#' fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,Fobs=Fobs,
-#'  sigFobs=sigFobs,Phicalc=phicalc)
+#'    # Create standardised fdata structure
+#'    fdata <- standardise_fdata(sdata$a,sdata$SG,hidx,Fobs=Fobs,
+#'     sigFobs=sigFobs,Phicalc=phicalc)
 #'  
-#' # Name of structure factors file (in home directory)
-#' homedir <- Sys.getenv("HOME")
-#' fname <- file.path(homedir,"test")
+#'    # Name of structure factors file (in home directory)
+#'    homedir <- Sys.getenv("HOME")
+#'    fname <- file.path(homedir,"test")
 #' 
-#' # Write data to file
-#' write_h(fname,fdata)
+#'    # Write data to file
+#'    write_h(fname,fdata)
+#' }    
 #' 
 #' @export
 write_h <- function(filename,fdata)
