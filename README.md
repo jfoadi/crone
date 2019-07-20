@@ -1,16 +1,26 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-crone
-=====
+
+# crone
 
 <!-- badges: start -->
+
 <!-- badges: end -->
-The goal of *crone* is to carry out most of the task and calculations of structural crystallography using 1D crystal structure models. The 1D models included with the package are taken from existing linear chemical molecules. A full description of the theory behind 1D crystallography and the *crone* package can be studied in this [article](https://iopscience.iop.org/article/10.1088/1361-6404/aa8188). The package is aimed at undergraduate and graduate students that need to be trained in structural crystallography or in the development of methods for structural crystallography.
 
-Installation
-------------
+The goal of *crone* is to carry out most of the task and calculations of
+structural crystallography using 1D crystal structure models. The 1D
+models included with the package are taken from existing linear chemical
+molecules. A full description of the theory behind 1D crystallography
+and the *crone* package can be studied in this
+[article](https://iopscience.iop.org/article/10.1088/1361-6404/aa8188).
+The package is aimed at undergraduate and graduate students that need to
+be trained in structural crystallography or in the development of
+methods for structural crystallography.
 
-You can install the released version of crone from [CRAN](https://CRAN.R-project.org) with:
+## Installation
+
+You can install the released version of crone from
+[CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("crone")
@@ -23,8 +33,7 @@ And the development version from [GitHub](https://github.com/) with:
 devtools::install_github("jfoadi/crone")
 ```
 
-Example
--------
+## Example
 
 Structures are stored in named lists of type `sdata`:
 
@@ -57,7 +66,8 @@ sdata
 #> [1] 1.0 0.5
 ```
 
-Once a structure is loaded (or created from scratch), the ideal electron density can be calculated and plotted:
+Once a structure is loaded (or created from scratch), the ideal electron
+density can be calculated and plotted:
 
 ``` r
 rtmp <- structure_gauss(sdata=sdata,N=1000)
@@ -67,7 +77,8 @@ plot(rtmp$x,rtmp$rr,type="l",
 
 <img src="man/figures/README-example2-1.png" width="100%" />
 
-The repeated motive in the unit cell can be plotted for several unit cells:
+The repeated motive in the unit cell can be plotted for several unit
+cells:
 
 ``` r
 x <- seq(-sdata$a*10,sdata$a*10,length=20000)
@@ -78,7 +89,8 @@ plot(rtmp$x,rtmp$rr,type="l",
 
 <img src="man/figures/README-example3-1.png" width="100%" />
 
-A diffraction pattern due to just one unit cell or to multiple unit cells is created with function `diffraction`:
+A diffraction pattern due to just one unit cell or to multiple unit
+cells is created with function `diffraction`:
 
 ``` r
 # One unit cell
@@ -99,4 +111,7 @@ plot(dtmp$xstar,dtmp$Imod,type="l",xlab=expression(s),
 
 <img src="man/figures/README-example4-2.png" width="100%" />
 
-Many more examples can be studied in the five tutorials included as package vignettes.
+Many more examples can be studied in the five tutorials included as
+package vignettes. The first three tutorials are set at an
+introductory/intermediate level; the last two tutorials are more
+difficult to digest.

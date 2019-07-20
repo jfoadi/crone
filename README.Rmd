@@ -80,4 +80,4 @@ plot(dtmp$xstar,dtmp$Imod,type="l",xlab=expression(s),
      ylab=expression(I))
 ```
 
-Many more examples can be studied in the five tutorials included as package vignettes.
+Many more examples can be studied in the five tutorials included as package vignettes. The first three tutorials are set at an introductory/intermediate level; the last two tutorials are more difficult to digest.

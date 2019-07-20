@@ -299,12 +299,12 @@ strufac <- function(hidx,sdata,anoflag=FALSE,
   }
   
   # Amplitudes and phases
-  F <- complex(real=FRe,imaginary=FIm,length.out=length(hidx))
-  Fmod <- Mod(F)
-  Fpha <- Arg(F)*180/pi
-  idx <- which(abs(Im(F)) < 0.000001 & abs(Re(F)) >= 0.000001 & Re(F) > 0)
+  FF <- complex(real=FRe,imaginary=FIm,length.out=length(hidx))
+  Fmod <- Mod(FF)
+  Fpha <- Arg(FF)*180/pi
+  idx <- which(abs(Im(FF)) < 0.000001 & abs(Re(FF)) >= 0.000001 & Re(FF) > 0)
   Fpha[idx] <- 0.0
-  idx <- which(abs(Im(F)) < 0.000001 & abs(Re(F)) >= 0.000001 & Re(F) < 0)
+  idx <- which(abs(Im(FF)) < 0.000001 & abs(Re(FF)) >= 0.000001 & Re(FF) < 0)
   Fpha[idx] <- 180.0
   
   return(list(Fmod=Fmod,Fpha=Fpha))
@@ -365,7 +365,7 @@ fousynth <- function(a,Fmod,Fpha,hidx,N)
     stop("Arrays do not have same length")
   
   # Merge amplitudes and phases in complex values
-  F <- complex(modulus=Fmod,argument=Fpha*pi/180,length.out=length(hidx))
+  FF <- complex(modulus=Fmod,argument=Fpha*pi/180,length.out=length(hidx))
   
   # Check numbers are compatible
   hmax <- max(abs(hidx))
@@ -376,7 +376,7 @@ fousynth <- function(a,Fmod,Fpha,hidx,N)
   nhidx <- 0:hmax
   nF <- rep(as.complex(0),length=(hmax+1))
   idx0 <- which(hidx == 0)
-  if (length(idx0) > 0) nF[1] <- F[idx0]
+  if (length(idx0) > 0) nF[1] <- FF[idx0]
   for (h in 1:hmax)
   {
     k <- h+1
@@ -384,15 +384,15 @@ fousynth <- function(a,Fmod,Fpha,hidx,N)
     idxM <- which(hidx == -h)
     if (length(idxP) > 0 & length(idxM) > 0)
     {
-      nF[k] <- 0.5*(F[idxP]+Conj(F[idxM]))
+      nF[k] <- 0.5*(FF[idxP]+Conj(FF[idxM]))
     }
     if (length(idxP) > 0 & length(idxM) == 0)
     {
-      nF[k] <- F[idxP]
+      nF[k] <- FF[idxP]
     }
     if (length(idxP) == 0 & length(idxM) > 0)
     {
-      nF[k] <- Conj(F[idxM])
+      nF[k] <- Conj(FF[idxM])
     }
   }
   
@@ -478,14 +478,14 @@ invfousynth <- function(a,rho,hidx)
   # Final structure factors
   fullidx <- 0:hmax
   idx <- match(hidx,fullidx)
-  F <- G[idx]
+  FF <- G[idx]
   
   # Amplitudes and phases
-  Fmod <- Mod(F)
-  Fpha <- Arg(F)*180/pi
-  idx <- which(abs(Im(F)) < 0.000001 & abs(Re(F)) >= 0.000001 & Re(F) > 0)
+  Fmod <- Mod(FF)
+  Fpha <- Arg(FF)*180/pi
+  idx <- which(abs(Im(FF)) < 0.000001 & abs(Re(FF)) >= 0.000001 & Re(FF) > 0)
   Fpha[idx] <- 0.0
-  idx <- which(abs(Im(F)) < 0.000001 & abs(Re(F)) >= 0.000001 & Re(F) < 0)
+  idx <- which(abs(Im(FF)) < 0.000001 & abs(Re(FF)) >= 0.000001 & Re(FF) < 0)
   Fpha[idx] <- 180.0
   
   return(list(Fmod=Fmod,Fpha=Fpha))
@@ -697,18 +697,18 @@ sfobs <- function(hidx,sdata,vx0err=NULL,ntrialP=100,ntrialG=100,
     newF <- 1000+1000*(Fobs-m)/b
     
     # Poissonians errors
-    F <- rep(0,times=length(Fobs))
-    sF <- rep(0,times=length(Fobs))
+    FF <- rep(0,times=length(Fobs))
+    sFF <- rep(0,times=length(Fobs))
     for (i in 1:length(hidx))
     {
       tmp <- rpois(n=ntrialP,lambda=round(newF[i],digits=0))
-      F[i] <- m+(M-m)*(mean(tmp)-1000)/1000
-      sF[i] <- abs((M-m)*sd(tmp)/1000)
+      FF[i] <- m+(M-m)*(mean(tmp)-1000)/1000
+      sFF[i] <- abs((M-m)*sd(tmp)/1000)
     }
     rm(newF,tmp)
-    Ffinal1 <- F
-    sFfinal1 <- sF
-    rm(F,sF)
+    Ffinal1 <- FF
+    sFfinal1 <- sFF
+    rm(FF,sFF)
   }
   
   # If atoms in the structure are affected by errors

@@ -37,17 +37,16 @@ Function to export all information concerning a given structure to a
 so-called coordinates file of type *_x.dat.
 }
 \examples{
-\dontrun{
-   # Create an arbitrary structure in P1
-   a <- 23
-   SG <- "P1"
-   x0 <- c(2,11,16,19)
-   Z <- c(6,6,16,8)
-   B <- c(13,14,5,10)
-   occ <- c(1,1,1,1)
-   prfx <- "test"
-   sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
-   write_x(prfx,sdata)
-}
+# Create an arbitrary structure in P1
+a <- 23
+SG <- "P1"
+x0 <- c(2,11,16,19)
+Z <- c(6,6,16,8)
+B <- c(13,14,5,10)
+occ <- c(1,1,1,1)
+wd <- tempdir()
+prfx <- file.path(wd,"test")
+sdata <- standardise_sdata(a,SG,x0,Z,B,occ)
+write_x(prfx,sdata)
 
 }

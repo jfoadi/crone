@@ -217,6 +217,7 @@ plot(rtmp$x,rtmp$rr,type="l",xlab=expression(x),
 
 \noindent Structure factors for this structure can be computed for positive and negative Miller indices up to, say, $h=80$. In the following code snippet their amplitudes for the first 5 Bijvoet pairs and corresponding averages, taken to be equal to the observed amplitudes, are also displayed.
 
+\begin{small}
 <<ch07>>=
 # h from 1 to 80
 hidx <- -80:80
@@ -251,6 +252,7 @@ line5 <- sprintf("%10.3f %10.3f %10.3f %10.3f",
                 Fplus[5],Fminus[5],Fobs[5],Dano[5])
 cat(c(line1,line2,line3,line4,line5),sep="\n")
 @
+\end{small}
 
 \noindent Let's now compare the anomalous difference map with the Patterson map. We have scaled up the anomalous map in order to compare it visually with the Patterson map.
 
@@ -317,6 +319,7 @@ Pmap$x[idxP[jdxP[c(2,4,6)]]]
 \noindent For this specific case, the second highest peak (both for the Patterson and the anomalous difference) is the one corresponding to the inter-atomic distance of the two irons which is, then, fixed at 3. We can place two iron atoms anywhere in the unit cell (because of the arbitrariety of cell's origin), as long as their distance is 3.00 \AA, i.e. the position of the chosen peak in the anomalous difference map. The two iron atoms arranged in this way form an initial model for the complete structure. In order to avoid placing atoms in the cell origin, let's choose positions $x=1$ and $x=4$ for the iron atoms in our initial model. The updated electron density map will consist of the observed structure factors and the phases coming from this model.
 
 \begin{center}
+\begin{small}
 <<ch12,out.width='3.2in'>>=
 # Updated model
 sdataU <- standardise_sdata(a=sdata$a,
@@ -335,6 +338,7 @@ rtmpU <- fousynth(a=sdata$a,Fmod=Fobs,Fpha=Fpha,hidx=1:80,N=1000)
 plot(rtmpU$x,rtmpU$rr,type="l",xlab=expression(x),
      ylab=expression(rho))
 @
+\end{small}
 \end{center}
 
 \noindent Aside from the main two peaks corresponding to iron atoms, there are many more smaller peaks, mostly corresponding to noise. Some of higher peaks, though, should correspond to the remaining carbon and oxygen. Trial and error maps with attempted C and O at these peaks position will eventually reveal the complete and correct structure.

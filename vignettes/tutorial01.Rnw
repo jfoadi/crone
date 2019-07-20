@@ -32,10 +32,12 @@ There are two types of data related to each 1D structure, the `direct-space' dat
 \newline
 \noindent The function responsible to load an \texttt{sdata} object is \texttt{load\_structure}. If called without argument, this function returns all the structures included in \texttt{crone}'s internal library of structures:
 
+\begin{small}
 <<ch01>>=
 library(crone)
 load_structure()
 @
+\end{small}
 
 \noindent Let's try and load data corresponding to thiocyanate:
 

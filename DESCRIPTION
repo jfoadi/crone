@@ -4,7 +4,8 @@ Title: Structural Crystallography in 1d
 Version: 0.1.0
 Date: 2019-07-16
 Authors@R: person("James","Foadi",email="j.foadi@bath.ac.uk",role=c("cre","aut"))
-Description: Structural crystallography calculations in one dimension.
+Description: Functions to carry out the most important crystallographic calculations for crystal 
+             structures made of 1d Gaussian-shaped atoms, especially useful for methods development.
 License: GPL-2
 LazyLoad: yes
 LazyData: true

@@ -4,6 +4,8 @@
 
 * Second resubmission: test_h.dat and test_x.dat actually were a product of examples execution. I have eliminated the problem by making the examples NotRun.
 
+* Third resubmission: changed the description in file DESCRIPTION; it's now more informative. Turned all F vectors into FF. Replaced some "print" and "cat" with "message". Changed printing files in examples from "homedir" to tempdir() and made the examples runnable. Re-checked vignettes.
+
 ## Test environments
 * Windows 10 - Using RStudio 1.2.1335
 * Linux - Using TRAVIS (installed biber and ghostscript)
