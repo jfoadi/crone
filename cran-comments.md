@@ -9,6 +9,7 @@
 ## Test environments
 * Windows 10 - Using RStudio 1.2.1335
 * Linux - Using TRAVIS (installed biber and ghostscript)
+* devtools::check_rhub - failed Ubuntu platform just for vignettes because no biber found
 
 ## R CMD check results
 Carried out from within RStudio.
