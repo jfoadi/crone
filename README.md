@@ -115,3 +115,8 @@ Many more examples can be studied in the five tutorials included as
 package vignettes. The first three tutorials are set at an
 introductory/intermediate level; the last two tutorials are more
 difficult to digest.
+
+## Reference
+
+E. Smith, G. Evans and J. Foadi (2017)
+<doi:https://doi.org/10.1088/1361-6404/aa8188>
