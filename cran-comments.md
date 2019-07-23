@@ -6,6 +6,8 @@
 
 * Third resubmission: changed the description in file DESCRIPTION; it's now more informative. Turned all F vectors into FF. Replaced some "print" and "cat" with "message". Changed printing files in examples from "homedir" to tempdir() and made the examples runnable. Re-checked vignettes.
 
+8 Fourth resubmission: added a reference in DESCRIPTION and README.
+
 ## Test environments
 * Windows 10 - Using RStudio 1.2.1335
 * Linux - Using TRAVIS (installed biber and ghostscript)
