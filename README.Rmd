@@ -84,4 +84,4 @@ Many more examples can be studied in the five tutorials included as package vign
 
 ## Reference
 
-E. Smith, G. Evans and J. Foadi (2017) <doi:doi.org/10.1088/1361-6404/aa8188>
+E. Smith, G. Evans and J. Foadi (2017) <https://doi.org/10.1088/1361-6404/aa8188>
