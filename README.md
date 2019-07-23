@@ -119,4 +119,4 @@ difficult to digest.
 ## Reference
 
 E. Smith, G. Evans and J. Foadi (2017)
-<doi:https://doi.org/10.1088/1361-6404/aa8188>
+<doi:doi.org/10.1088/1361-6404/aa8188>

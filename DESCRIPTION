@@ -6,7 +6,7 @@ Date: 2019-07-16
 Authors@R: person("James","Foadi",email="j.foadi@bath.ac.uk",role=c("cre","aut"))
 Description: Functions to carry out the most important crystallographic calculations for crystal 
              structures made of 1d Gaussian-shaped atoms, especially useful for methods development.
-             E. Smith, G. Evans, J. Foadi (2017) <doi:https://doi.org/10.1088/1361-6404/aa8188>
+             E. Smith, G. Evans, J. Foadi (2017) <doi:doi.org/10.1088/1361-6404/aa8188>
 License: GPL-2
 LazyLoad: yes
 LazyData: true
