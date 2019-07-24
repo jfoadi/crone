@@ -118,5 +118,7 @@ difficult to digest.
 
 ## Reference
 
-E. Smith, G. Evans and J. Foadi (2017)
-<https://doi.org/10.1088/1361-6404/aa8188>
+Details of the theory and algorithms behind `crone` can be found in: E.
+Smith, G. Evans and J. Foadi (2017), “An effective introduction to
+structural crystallography using 1D Gaussian atoms”, Eur. J. Phys. 38,
+[link](https://doi.org/10.1088/1361-6404/aa8188)

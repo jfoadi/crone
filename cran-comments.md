@@ -6,7 +6,13 @@
 
 * Third resubmission: changed the description in file DESCRIPTION; it's now more informative. Turned all F vectors into FF. Replaced some "print" and "cat" with "message". Changed printing files in examples from "homedir" to tempdir() and made the examples runnable. Re-checked vignettes.
 
-8 Fourth resubmission: added a reference in DESCRIPTION and README.
+* Fourth resubmission: added a reference in DESCRIPTION and README.
+
+* Fifth resubmission: hopefully the DOI format in DESCRIPTION is now fine.
+
+* Sixth resubmission: rechanged DOI format as <doi:10..1088/1361-6404/aa8188>
+
+* Seventh resubmission: DESCRIPTION is fine. Link in README has been changed to [link]() format
 
 ## Test environments
 * Windows 10 - Using RStudio 1.2.1335
