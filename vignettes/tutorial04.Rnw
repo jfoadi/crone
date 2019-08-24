@@ -3,9 +3,9 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{hyperref}
-\usepackage[backend=biber,sorting=none]{biblatex}
+%\usepackage[backend=biber,sorting=none]{biblatex}
 
-\bibliography{BIBLIOGRAPHY}
+%\bibliography{BIBLIOGRAPHY}
 
 \author{James Foadi \\ 
         email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
@@ -16,18 +16,18 @@
 %\VignetteIndexEntry{Calculations for Pinkerton}
 %\VignetteEngine{knitr::knitr}
 
-<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
-system ("biber tutorial04")
-@
+%<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
+%system ("biber tutorial04")
+%@
 
 \begin{document}
 
 \maketitle
 
-\noindent Prior to the publication of reference \cite{crn} there have been at least two excellent introductions to 1D structural crystallography (see \cite{stoutjens},\cite{pinkerton}). Citation \cite{pinkerton} by A. A. Pinkerton is an article in which a few important topics in structural crystallography are illustrated using a simple $P\bar{1}$ 1D structure made of two carbon atoms. In this tutorial we will reproduce Pinkerton's examples using tools from \texttt{crone}.
+\noindent Prior to the publication of reference [1] there have been at least two excellent introductions to 1D structural crystallography (see [2,3]). Citation [3] by A. A. Pinkerton is an article in which a few important topics in structural crystallography are illustrated using a simple $P\bar{1}$ 1D structure made of two carbon atoms. In this tutorial we will reproduce Pinkerton's examples using tools from \texttt{crone}.
 
 \section{Pinkerton's structure}
-This structure is available as internal data "pinkerton2015". It is a $P\bar{1}$ structure made of two carbon atoms. The B factor is not given in reference \cite{pinkerton} and, in line with the way B factors are generated in \texttt{crone}, it has been assigned value 13.333 $\AA^2$. Data are generated in the following code snippet.
+This structure is available as internal data "pinkerton2015". It is a $P\bar{1}$ structure made of two carbon atoms. The B factor is not given in reference [3] and, in line with the way B factors are generated in \texttt{crone}, it has been assigned value 13.333 $\AA^2$. Data are generated in the following code snippet.
 
 \begin{center}
 <<ch01,out.width='3.2in'>>=
@@ -206,7 +206,7 @@ rtmp$x[idx]
 
 
 \section{Structure factors and Fourier synthesis}
-In reference \cite{pinkerton} two sections are devoted to the computation of the structure factors and the Fourier synthesis. With \texttt{crone} these tasks are accompished by the two functions \texttt{strufac} and \texttt{fousynth} which we have used previously.
+In reference [3] two sections are devoted to the computation of the structure factors and the Fourier synthesis. With \texttt{crone} these tasks are accompished by the two functions \texttt{strufac} and \texttt{fousynth} which we have used previously.
 
 
 \section{Direct Methods}
@@ -311,7 +311,7 @@ P_{+}=\frac{1}{2}+\frac{1}{2}\tanh\left(\frac{|E_h E_h E_{2h}|}{\sqrt{2}}\right)
 \Sigma_2\ \mathrm{relationship:}\quad
 P_{+}=\frac{1}{2}+\frac{1}{2}\tanh\left(\frac{|E_h E_k E_{h-k}|}{\sqrt{2}}\right)
 \end{equation*}
-These two relationships return the probability that the specific product considered ($E_h E_hE_{2h}$ for $\Sigma_1$ and $E_hE_kE_{h-k}$ for $\Sigma_2$) has a positive sign. In the following snippet we calculate some of these probabilities, considering $h,k,h-k$ varying between 1 and 12, as reported in reference \cite{pinkerton}.
+These two relationships return the probability that the specific product considered ($E_h E_hE_{2h}$ for $\Sigma_1$ and $E_hE_kE_{h-k}$ for $\Sigma_2$) has a positive sign. In the following snippet we calculate some of these probabilities, considering $h,k,h-k$ varying between 1 and 12, as reported in reference [3].
 
 <<ch12>>=
 # Normalised structure factors used
@@ -357,7 +357,7 @@ idx <- order(S2_table[,4],decreasing=TRUE)
 print(S2_table[idx,])
 @
 
-\noindent The values in the above table are close but not identical to the values presented in reference \cite{pinkerton} probably due to round off errors in computing \texttt{tanh} and because the normalised structure factors are slightly different from those in the reference. Some of the triplet combinations return the same value of $P_{+}$ because the indices are the same, only appearing in different order. We have, though, a sufficient number of $\Sigma_1$ and $\Sigma_2$ combinations to attempt phasing. At this point we could follow exactly the choice made in the reference and proceed with phasing. We will, instead, try a different avenue. The important step in direct methods is to work initially with large normalised structure factors. In this specific case these correspond to Miller indices 3,5,6,8,11. To fix the origin we need to pick (see earlier discussion) a reflection with odd $h$ and assign it positive sign. Due to the two top lines of the $\Sigma_1$ relationships, the best choice falls on either $h=3$ or $h=5$; let's pick $h=5$. Sign assignment for the $\Sigma_1$ relationships results, then, as follows:
+\noindent The values in the above table are close but not identical to the values presented in reference [3] probably due to round off errors in computing \texttt{tanh} and because the normalised structure factors are slightly different from those in the reference. Some of the triplet combinations return the same value of $P_{+}$ because the indices are the same, only appearing in different order. We have, though, a sufficient number of $\Sigma_1$ and $\Sigma_2$ combinations to attempt phasing. At this point we could follow exactly the choice made in the reference and proceed with phasing. We will, instead, try a different avenue. The important step in direct methods is to work initially with large normalised structure factors. In this specific case these correspond to Miller indices 3,5,6,8,11. To fix the origin we need to pick (see earlier discussion) a reflection with odd $h$ and assign it positive sign. Due to the two top lines of the $\Sigma_1$ relationships, the best choice falls on either $h=3$ or $h=5$; let's pick $h=5$. Sign assignment for the $\Sigma_1$ relationships results, then, as follows:
 \begin{equation*}
 \begin{array}{rcccc}
 \Sigma_1: & \qquad & 3 & 3 & 6^{+} \\
@@ -701,7 +701,12 @@ points(rtmpC$x,rtmpC$rr,type="l",col=2)
 
 \noindent The matching is not complete, but it is very good. In real applications one can never know the correct phases (or signs) and some errors are to be expected in the final electron density.
 
-\printbibliography
-
+%\printbibliography
+\section*{References}
+\begin{itemize}
+\item[[ 1]] E. Smith, G. Evans and J. Foadi. "An effective introduction to structural crystallography using 1D Gaussian atoms". In: \emph{Eur. J. Phys.} {\bf 38} (2017) \href{https://doi.org/10.1088/1361-6404/aa8188}{DOI: 10.1088/1361-6404/aa8188}.
+\item[[ 2]] G. H. Stout and L. H. Jensen. "X-ray Structure Determination. A Practical Guide". (1968) McMillan, New York.
+\item[[ 3]] A. A. Pinkerton. "Why crystal structure analysis works: a one-dimensional   crystallography teaching tool". In: \emph{J. Appl. Cryst.} (2015) {\bf 48} 901-905.
+\end{itemize}
 
 \end{document}

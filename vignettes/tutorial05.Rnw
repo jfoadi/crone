@@ -3,9 +3,9 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{hyperref}
-\usepackage[backend=biber,sorting=none]{biblatex}
+%\usepackage[backend=biber,sorting=none]{biblatex}
 
-\bibliography{BIBLIOGRAPHY}
+%\bibliography{BIBLIOGRAPHY}
 
 \author{James Foadi \\ 
         email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
@@ -16,16 +16,16 @@
 %\VignetteIndexEntry{Anomalous Phasing}
 %\VignetteEngine{knitr::knitr}
 
-<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
-system ("biber tutorial05")
-@
+%<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
+%system ("biber tutorial05")
+%@
 
 \begin{document}
 
 \maketitle
 
 \section{Anomalous scattering}
-This is a very cursory presentation of anomalous scattering in crystallography. A very accessible but more in-depth introduction to the same subject can be found on the web site maintained by Ethan Merritt at the Biomolecular Structure Centre, University of Washington \cite{merritt}. Atoms scatter anomalously when the energy, and thus the wavelength, used is close to their resonant values. This means that in general crystals do not scatter anomalously or, better, that the magnitude of anomalous diffraction is negligible when compared to ordinary scattering. At specific wavelengths, though, certain atoms in the crystal resonate and the resulting diffracted beam includes significant anomalous contributions. Their particular nature is exploited for phasing, i.e. to find phases for the scattering factors. Ordinary diffraction is mathematically reflected in the usual factor appearing in the following equation,
+This is a very cursory presentation of anomalous scattering in crystallography. A very accessible but more in-depth introduction to the same subject can be found on the web site maintained by Ethan Merritt at the Biomolecular Structure Centre, University of Washington [1]. Atoms scatter anomalously when the energy, and thus the wavelength, used is close to their resonant values. This means that in general crystals do not scatter anomalously or, better, that the magnitude of anomalous diffraction is negligible when compared to ordinary scattering. At specific wavelengths, though, certain atoms in the crystal resonate and the resulting diffracted beam includes significant anomalous contributions. Their particular nature is exploited for phasing, i.e. to find phases for the scattering factors. Ordinary diffraction is mathematically reflected in the usual factor appearing in the following equation,
 \begin{equation*}
 \label{eq:18}
 F_h=\sum_{j=1}^{N} f_j\exp\left(2\pi\mathrm{i} h\frac{x_j}{a}\right),
@@ -92,7 +92,7 @@ text(x=-7.7,y=-6,labels="N")
 \begin{equation*}
 F_h=\sum_{j=1}^{N} (f_j+f'_j+\mathrm{i} f''_j)\exp\left(2\pi\mathrm{i} h\frac{x_j}{a}\right)
 \end{equation*} 
-The new scattering factor is equal to the ordinary, real, component plus a complex one, $f'_j+\mathrm{i} f''_j$. Both real and imaginary parts of this additional anomalous factor are virtually independent of resolution and only depend on wavelength. Values of $f'_j$ and $f''_j$ for all atomic species and for several wavelengths have been calculated theoretically and can be easily tabulated. The values used in \texttt{crone} have been extracted from Ethan Merritt's site \cite{merritt}. An example of $f'_j$ and $f''_j$ as functions of wavelength for the iron atom can be obtained using \texttt{crone} function \texttt{plot\_absorption\_curves}, The second argument of this function also allows to zoom in or out the plot at a specified window with minimum and maximum wavelength $\lambda$.
+The new scattering factor is equal to the ordinary, real, component plus a complex one, $f'_j+\mathrm{i} f''_j$. Both real and imaginary parts of this additional anomalous factor are virtually independent of resolution and only depend on wavelength. Values of $f'_j$ and $f''_j$ for all atomic species and for several wavelengths have been calculated theoretically and can be easily tabulated. The values used in \texttt{crone} have been extracted from Ethan Merritt's site [1]. An example of $f'_j$ and $f''_j$ as functions of wavelength for the iron atom can be obtained using \texttt{crone} function \texttt{plot\_absorption\_curves}, The second argument of this function also allows to zoom in or out the plot at a specified window with minimum and maximum wavelength $\lambda$.
 
 \begin{center}
 <<ch02,out.width='3.2in',echo=FALSE>>=
@@ -184,7 +184,7 @@ where,
 \begin{equation*}
 \Delta_{ano}(h)\equiv ||F^{+}|-|F^{-}||
 \end{equation*}
-It can be shown that the anomalous difference map is equivalent to a corrupted Patterson map in which some of the prominent peaks correspond to distances between the anomalous scatterers, e.g. peaks between heavy atoms \cite{woolfson}. Once these distances have been measured, an initial, approximate model of the structure, made of anomalous scatterers, can be suggested. An updated Fourier transform calculated with the experimental structure factors' amplitudes and phases from the initial model, should show improved positions for the anomalous scatterers, but also peaks corresponding to atoms not yet determined. The updated density map will be closer to the true density map if the selected peaks from the anomalous Fourier difference are the correct ones. The updated density can, in turn, be used to confirm or reject the positions of the anomalous scatterers and to select new peaks for the atoms missing from the initial approximate model of the structure. Old and new peaks will form a new structural model used to carry out another Fourier cycle (observed amplitudes and calculated phases). This sort of Fourier recycling provides atomic positions converging to the correct structure, if the initial anomalous scatterers have been properly selected. A specific example will make the procedure clearer.\\
+It can be shown that the anomalous difference map is equivalent to a corrupted Patterson map in which some of the prominent peaks correspond to distances between the anomalous scatterers, e.g. peaks between heavy atoms [2]. Once these distances have been measured, an initial, approximate model of the structure, made of anomalous scatterers, can be suggested. An updated Fourier transform calculated with the experimental structure factors' amplitudes and phases from the initial model, should show improved positions for the anomalous scatterers, but also peaks corresponding to atoms not yet determined. The updated density map will be closer to the true density map if the selected peaks from the anomalous Fourier difference are the correct ones. The updated density can, in turn, be used to confirm or reject the positions of the anomalous scatterers and to select new peaks for the atoms missing from the initial approximate model of the structure. Old and new peaks will form a new structural model used to carry out another Fourier cycle (observed amplitudes and calculated phases). This sort of Fourier recycling provides atomic positions converging to the correct structure, if the initial anomalous scatterers have been properly selected. A specific example will make the procedure clearer.\\
 \newline
 Consider a P1 structure made of one carbon, one oxygen and two iron atoms at positions:
 \begin{equation*}
@@ -344,7 +344,12 @@ plot(rtmpU$x,rtmpU$rr,type="l",xlab=expression(x),
 \noindent Aside from the main two peaks corresponding to iron atoms, there are many more smaller peaks, mostly corresponding to noise. Some of higher peaks, though, should correspond to the remaining carbon and oxygen. Trial and error maps with attempted C and O at these peaks position will eventually reveal the complete and correct structure.
 
 
-\printbibliography
+%\printbibliography
+\section*{References}
+\begin{itemize}
+\item[[ 1]] E. A. Merritt. "X-ray Anomalous Scattering". (2012) \href{http://skuld.bmsc.washington.edu/scatter/AS_index.html}{Link to Web page}.
+\item[[ 2]] M. M. Woolfson. "An Introduction to X-ray Crystallography". (1997) Cambridge University Press.
+\end{itemize}
 
 
 \end{document}

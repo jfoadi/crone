@@ -3,9 +3,9 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{hyperref}
-\usepackage[backend=biber,sorting=none]{biblatex}
+%\usepackage[backend=biber,sorting=none]{biblatex}
 
-\bibliography{BIBLIOGRAPHY}
+%\bibliography{BIBLIOGRAPHY}
 
 \author{James Foadi \\ 
         email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
@@ -16,15 +16,15 @@
 %\VignetteIndexEntry{Approximate phases and peak search}
 %\VignetteEngine{knitr::knitr}
 
-<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
-system ("biber tutorial03")
-@
+%<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
+%system ("biber tutorial03")
+%@
 
 \begin{document}
 
 \maketitle
 
-\noindent This tutorial follows part of the demonstration in reference \cite{crn}.
+\noindent This tutorial follows part of the demonstration in reference [1].
 
 \section{Peak search with \texttt{local\_maxima}}
 The main goal of structural crystallography is to find the positional coordinates of all atoms in a given structure. The quantity that can be calculated using the experimental data is the electron density. The atomic coordinates can be extracted from the electron density as positions corresponding to the density peaks' maxima. The function in \texttt{crone} responsible for extracting such maxima is \texttt{local\_maxima}. In order to appreciate how this function works, let's load the structure called \emph{cyanate}.
@@ -281,7 +281,11 @@ points(rtmp1$x,rtmp1$rr,type="l",lty=2)
 @
 \end{center}
 
-\printbibliography
+%\printbibliography
+\section*{References}
+\begin{itemize}
+\item[[ 1]] E. Smith, G. Evans and J. Foadi. "An effective introduction to structural crystallography using 1D Gaussian atoms". In: \emph{Eur. J. Phys.} {\bf 38} (2017) \href{https://doi.org/10.1088/1361-6404/aa8188}{DOI: 10.1088/1361-6404/aa8188}.
+\end{itemize}
 
 
 \end{document}

@@ -4,7 +4,6 @@ language: R
 cache: packages
 
 before_install:
-  - sudo apt-get install -y biber
   - sudo apt-get install -y ghostscript
 addons:
   apt:

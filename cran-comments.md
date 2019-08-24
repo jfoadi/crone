@@ -14,9 +14,11 @@
 
 * Seventh resubmission: DESCRIPTION is fine. Link in README has been changed to [link]() format
 
+* eight resubmission: drastically changed references as "biber" was causing problems to CRAN automated building. Now references are inserted manually as there's just a handful of them.
+
 ## Test environments
 * Windows 10 - Using RStudio 1.2.1335
-* Linux - Using TRAVIS (installed biber and ghostscript)
+* Linux - Using TRAVIS (installed ghostscript)
 * devtools::check_rhub - failed Ubuntu platform just for vignettes because no biber found
 
 ## R CMD check results

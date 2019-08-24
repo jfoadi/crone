@@ -3,9 +3,9 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{hyperref}
-\usepackage[backend=biber,sorting=none]{biblatex}
+%\usepackage[backend=biber,sorting=none]{biblatex}
 
-\bibliography{BIBLIOGRAPHY}
+%\bibliography{BIBLIOGRAPHY}
 
 \author{James Foadi \\ 
         email \href{mailto:j.foadi@bath.ac.uk}{j.foadi@bath.ac.uk}}
@@ -16,9 +16,9 @@
 %\VignetteIndexEntry{Play with thiocyanate}
 %\VignetteEngine{knitr::knitr}
 
-<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
-system ("biber tutorial01")
-@
+%<<setup, eval= TRUE, include= FALSE, cache= FALSE, echo= FALSE>>=
+%system ("biber tutorial01")
+%@
 
 
 \begin{document}
@@ -187,8 +187,12 @@ fdata$Phicalc[1:4]
 Fpha[2:5]
 @
 
-\noindent The small differences between the previously-calculated structure factors' amplitudes and the loaded ones is due to experimental errors being artificially introduced when simulating the observed structure factors (see \cite{crn}).
+\noindent The small differences between the previously-calculated structure factors' amplitudes and the loaded ones is due to experimental errors being artificially introduced when simulating the observed structure factors (see [1]).
 
-\printbibliography
+%\printbibliography
+\section*{References}
+\begin{itemize}
+\item[[ 1]] E. Smith, G. Evans and J. Foadi. "An effective introduction to structural crystallography using 1D Gaussian atoms". In: \emph{Eur. J. Phys.} {\bf 38} (2017) \href{https://doi.org/10.1088/1361-6404/aa8188}{DOI: 10.1088/1361-6404/aa8188}.
+\end{itemize}
 
 \end{document}
