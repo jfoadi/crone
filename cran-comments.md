@@ -14,12 +14,12 @@
 
 * Seventh resubmission: DESCRIPTION is fine. Link in README has been changed to [link]() format
 
-* eight resubmission: drastically changed references as "biber" was causing problems to CRAN automated building. Now references are inserted manually as there's just a handful of them.
+* eight resubmission (now version 0.1.1): drastically changed references as "biber" was causing problems to CRAN automated building. Now references are inserted manually as there's just a handful of them.
 
 ## Test environments
 * Windows 10 - Using RStudio 1.2.1335
 * Linux - Using TRAVIS (installed ghostscript)
-* devtools::check_rhub - 
+* devtools::check_rhub - Only Windows complain about missing ghostscript (not something I can control, I believe)
 
 ## R CMD check results
 Carried out from within RStudio.
