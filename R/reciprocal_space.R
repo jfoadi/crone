@@ -360,7 +360,7 @@ strufac <- function(hidx,sdata,anoflag=FALSE,
 #' @export
 fousynth <- function(a,Fmod,Fpha,hidx,N)
 {
-  # Arrays checks
+  # Arrays check
   if (length(Fmod) != length(hidx) | length(Fpha) != length(hidx))
     stop("Arrays do not have same length")
   
